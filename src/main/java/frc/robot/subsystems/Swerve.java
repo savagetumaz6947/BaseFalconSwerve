@@ -65,6 +65,13 @@ public class Swerve extends SubsystemBase {
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
         }
+
+        SmartDashboard.putNumber("yaw", getYaw().getDegrees());
+        SmartDashboard.putNumber("translationX", translation.getX());
+        SmartDashboard.putNumber("translationY", translation.getY());
+        SmartDashboard.putNumber("rotation", rotation);
+
+        SmartDashboard.putBoolean("fieldOriented", fieldRelative);
     }    
 
     /* Used by SwerveControllerCommand in Auto */
@@ -105,7 +112,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public Rotation2d getYaw() {
-        return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - navx.getYaw()) : Rotation2d.fromDegrees(navx.getYaw());
+        return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - (navx.getYaw() < 0 ? (navx.getYaw()+360)%360 : navx.getYaw())) : Rotation2d.fromDegrees((navx.getYaw() < 0 ? (navx.getYaw()+360)%360 : navx.getYaw()));
     }
 
     public void resetModulesToAbsolute(){
