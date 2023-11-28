@@ -44,18 +44,18 @@ public class SwerveModule {
         lastAngle = getState().angle;
     }
 
-    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop){
+    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, int maxSpeedMode){
         /* This is a custom optimize function, since default WPILib optimize assumes continuous controller which CTRE and Rev onboard is not */
         desiredState = CTREModuleState.optimize(desiredState, getState().angle); 
         SmartDashboard.putNumber("Mod " + moduleNumber + " Angle", desiredState.angle.getDegrees());
         SmartDashboard.putNumber("Mod " + moduleNumber + " sMPS", desiredState.speedMetersPerSecond);
-        setAngle(desiredState);
-        setSpeed(desiredState, isOpenLoop);
+        setAngle(desiredState, maxSpeedMode);
+        setSpeed(desiredState, isOpenLoop, maxSpeedMode);
     }
 
-    private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){
+    private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop, int maxSpeedMode){
         if(isOpenLoop){
-            double percentOutput = desiredState.speedMetersPerSecond / Constants.Swerve.maxSpeed;
+            double percentOutput = desiredState.speedMetersPerSecond / Constants.Swerve.maxSpeed[maxSpeedMode];
             mDriveMotor.set(ControlMode.PercentOutput, percentOutput);
         }
         else {
@@ -64,8 +64,8 @@ public class SwerveModule {
         }
     }
 
-    private void setAngle(SwerveModuleState desiredState){
-        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.Swerve.maxSpeed * 0.01)) ? lastAngle : desiredState.angle; //Prevent rotating module if speed is less then 1%. Prevents Jittering.
+    private void setAngle(SwerveModuleState desiredState, int maxSpeedMode){
+        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.Swerve.maxSpeed[maxSpeedMode] * 0.01)) ? lastAngle : desiredState.angle; //Prevent rotating module if speed is less then 1%. Prevents Jittering.
         
         mAngleMotor.set(ControlMode.Position, Conversions.degreesToFalcon(angle.getDegrees(), Constants.Swerve.angleGearRatio));
         lastAngle = angle;

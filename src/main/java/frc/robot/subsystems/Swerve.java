@@ -46,7 +46,9 @@ public class Swerve extends SubsystemBase {
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop, int maxSpeedMode) {
+        translation = translation.times(Constants.Swerve.maxSpeed[maxSpeedMode]);
+
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -60,10 +62,10 @@ public class Swerve extends SubsystemBase {
                                     translation.getY(), 
                                     rotation)
                                 );
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed[maxSpeedMode]);
 
         for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop, maxSpeedMode);
         }
 
         SmartDashboard.putNumber("yaw", getYaw().getDegrees());
@@ -72,14 +74,15 @@ public class Swerve extends SubsystemBase {
         SmartDashboard.putNumber("rotation", rotation);
 
         SmartDashboard.putBoolean("fieldOriented", fieldRelative);
+        SmartDashboard.putNumber("maxSpeed", Constants.Swerve.maxSpeed[maxSpeedMode]);
     }    
 
     /* Used by SwerveControllerCommand in Auto */
-    public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
+    public void setModuleStates(SwerveModuleState[] desiredStates, int maxSpeedMode) {
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed[maxSpeedMode]);
         
         for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(desiredStates[mod.moduleNumber], false);
+            mod.setDesiredState(desiredStates[mod.moduleNumber], false, 1);
         }
     }    
 

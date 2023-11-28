@@ -78,7 +78,7 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 2.36; //TODO: This must be tuned to specific robot & this is calculated using 3000rpm and 2" radius
+        public static final double[] maxSpeed = {1.3, 1.8, 2.36}; //TODO: This must be tuned to specific robot & this is calculated using 3000rpm and 2" radius
         /** Radians per Second */
         public static final double maxAngularVelocity = 5.0; //TODO: This must be tuned to specific robot
 

@@ -29,7 +29,10 @@ public class RobotContainer {
     /* Driver Buttons */
     private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton robotCentricToggleButton = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+    private final JoystickButton turboMode = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
+
     private boolean robotCentric = true;
+    private int maxSpeedMode = 1;
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -43,7 +46,8 @@ public class RobotContainer {
                 () -> -driver.getRawAxis(translationAxis), 
                 () -> -driver.getRawAxis(strafeAxis), 
                 () -> -driver.getRawAxis(rotationAxis), 
-                () -> robotCentric
+                () -> robotCentric,
+                () -> maxSpeedMode
             )
         );
 
@@ -60,7 +64,9 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-        robotCentricToggleButton.onTrue(new InstantCommand(() -> robotCentric = !robotCentric));
+        robotCentricToggleButton.toggleOnTrue(new InstantCommand(() -> robotCentric = !robotCentric));
+        turboMode.onTrue(new InstantCommand(() -> maxSpeedMode = 2));
+        turboMode.onFalse(new InstantCommand(() -> maxSpeedMode = 1));
     }
 
     /**
