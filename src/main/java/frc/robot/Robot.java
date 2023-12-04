@@ -29,18 +29,20 @@ public class Robot extends LoggedRobot {
 
   private RobotContainer m_robotContainer;
 
+  private PowerDistribution pdh;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
   public void robotInit() {
-    Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+    Logger.getInstance().recordMetadata("Project Name", "Savage Tumaz by Aaron"); // Set a metadata value
 
     if (isReal()) {
         Logger.getInstance().addDataReceiver(new WPILOGWriter("/U")); // Log to a USB stick
         Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-        new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+        pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
     } else {
         setUseTiming(false); // Run as fast as possible
         String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
