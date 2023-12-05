@@ -31,8 +31,6 @@ public class Swerve extends SubsystemBase {
 
     public Swerve() {
         navx = new AHRS(SPI.Port.kMXP);
-        navx.calibrate();
-        zeroGyro();
 
         mSwerveMods = new SwerveModule[] {
             new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -47,7 +45,9 @@ public class Swerve extends SubsystemBase {
         Timer.delay(1.0);
         resetModulesToAbsolute();
 
-        swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
+        zeroGyro();
+
+        swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions(), new Pose2d(2, 2, getYaw()));
 
         AutoBuilder.configureHolonomic(this::getPose, this::resetOdometry, 
                                         () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates()),
@@ -129,12 +129,15 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic(){
-        swerveOdometry.update(getYaw(), getModulePositions());  
+        swerveOdometry.update(getYaw(), getModulePositions());
+        System.out.println(getPose().toString());
+        Logger.recordOutput("RobotPose", getPose());
+        Logger.recordOutput("Robot Module States", getModuleStates());
 
         for(SwerveModule mod : mSwerveMods){
-            Logger.getInstance().recordOutput("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
-            Logger.getInstance().recordOutput("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
-            Logger.getInstance().recordOutput("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);  
+            Logger.recordOutput("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
+            Logger.recordOutput("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
+            Logger.recordOutput("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);  
         }
     }
 }

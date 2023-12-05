@@ -6,14 +6,12 @@ import frc.robot.subsystems.Swerve;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 
-public class TeleopSwerve extends CommandBase {    
+public class TeleopSwerve extends Command {    
     private Swerve s_Swerve;    
     private DoubleSupplier translationSup;
     private DoubleSupplier strafeSup;
@@ -28,6 +26,8 @@ public class TeleopSwerve extends CommandBase {
         this.strafeSup = strafeSup;
         this.rotationSup = rotationSup;
         this.robotCentricSup = robotCentricSup;
+
+        s_Swerve.navx.reset();
     }
 
     @Override
@@ -36,10 +36,6 @@ public class TeleopSwerve extends CommandBase {
         double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband);
         double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
         double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
-
-        // s_Swerve.getModuleStates()
-        Logger.getInstance().recordOutput("Module States", s_Swerve.getModuleStates());
-        Logger.getInstance().recordOutput("Pose", s_Swerve.getPose());
 
         /* Drive */
         s_Swerve.drive(

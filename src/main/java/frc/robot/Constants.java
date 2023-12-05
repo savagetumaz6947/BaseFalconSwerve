@@ -21,8 +21,8 @@ public final class Constants {
             COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L2);
 
         /* Drivetrain Constants */
-        public static final double trackWidth = 0.594377;
-        public static final double wheelBase = 0.596207;
+        public static final double trackWidth = 0.595;
+        public static final double wheelBase = 0.595;
         public static final double wheelCircumference = chosenModule.wheelCircumference;
 
         /* Swerve Kinematics 
@@ -131,26 +131,10 @@ public final class Constants {
     }
 
     public static final HolonomicPathFollowerConfig autoConstants = new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+        new PIDConstants(5.0, .05, 0.0), // Translation PID constants
         new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
         Swerve.maxSpeed, // Max module speed, in m/s
         Math.sqrt(Math.pow(Swerve.wheelBase / 2, 2) + Math.pow(Swerve.trackWidth / 2, 2)), // Drive base radius in meters. Distance from robot center to furthest module.
         new ReplanningConfig() // Default path replanning config. See the API for the options here
     );
-
-    // public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
-    //     public static final double kMaxSpeedMetersPerSecond = 3;
-    //     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    //     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    //     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
-    
-    //     public static final double kPXController = 1;
-    //     public static final double kPYController = 1;
-    //     public static final double kPThetaController = 1;
-    
-    //     /* Constraint for the motion profilied robot angle controller */
-    //     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-    //         new TrapezoidProfile.Constraints(
-    //             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-    // }
 }
