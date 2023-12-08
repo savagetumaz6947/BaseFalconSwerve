@@ -67,25 +67,23 @@ public class Swerve extends SubsystemBase {
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         driveToChasis(fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                                    translation.getX(), 
-                                    translation.getY(), 
-                                    rotation, 
-                                    getYaw()
-                                )
-                                : new ChassisSpeeds(
-                                    translation.getX(), 
-                                    translation.getY(), 
-                                    rotation)
-                                );
-        
+                        translation.getX(), 
+                        translation.getY(), 
+                        rotation, 
+                        getYaw())
+                      : new ChassisSpeeds(
+                          translation.getX(), 
+                          translation.getY(), 
+                          rotation)
+                      );
     }
 
-    /* Used by SwerveControllerCommand in Auto */
-    public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
+    /* Used by SwerveControllerCommand in Auto TODO: integrate code */
+    public void setModuleStates(SwerveModuleState[] desiredStates, int maxSpeedMode) {
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed[maxSpeedMode]);
         
         for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(desiredStates[mod.moduleNumber], false);
+            mod.setDesiredState(desiredStates[mod.moduleNumber], false, 1);
         }
     }    
 
