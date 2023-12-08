@@ -56,16 +56,21 @@ public class Swerve extends SubsystemBase {
                                         this);
     }
 
+    /* Wrapper function that uses the Autonomous maxSpeedIndex for autonomous */
     public void driveToChasis(ChassisSpeeds cSpeeds) {
+        driveToChasis(cSpeeds, Constants.Swerve.autonomousMaxSpeedIndex);
+    }
+
+    public void driveToChasis(ChassisSpeeds cSpeeds, int maxSpeedMode) {
         SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(cSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed[maxSpeedMode]);
 
         for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false, maxSpeedMode);
         }
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop, int maxSpeedMode) {
         driveToChasis(fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         translation.getX(), 
                         translation.getY(), 
@@ -75,17 +80,8 @@ public class Swerve extends SubsystemBase {
                           translation.getX(), 
                           translation.getY(), 
                           rotation)
-                      );
+                      , maxSpeedMode);
     }
-
-    /* Used by SwerveControllerCommand in Auto TODO: integrate code */
-    public void setModuleStates(SwerveModuleState[] desiredStates, int maxSpeedMode) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed[maxSpeedMode]);
-        
-        for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(desiredStates[mod.moduleNumber], false, 1);
-        }
-    }    
 
     public Pose2d getPose() {
         return swerveOdometry.getPoseMeters();
