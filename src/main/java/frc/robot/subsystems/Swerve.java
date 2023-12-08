@@ -27,7 +27,6 @@ public class Swerve extends SubsystemBase {
     public SwerveModule[] mSwerveMods;
     public AHRS navx;
     public ChassisSpeeds robotChassisSpeeds;
-    // public Pigeon2 gyro;
 
     public Swerve() {
         navx = new AHRS(SPI.Port.kMXP);

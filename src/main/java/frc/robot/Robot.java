@@ -43,14 +43,18 @@ public class Robot extends LoggedRobot {
     Logger.recordMetadata("Project Name", "Savage Tumaz by Aaron"); // Set a metadata value
 
     if (isReal()) {
-        // Logger.addDataReceiver(new WPILOGWriter("/U")); // Log to a USB stick
-        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-        pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+      try {
+        Logger.addDataReceiver(new WPILOGWriter("/U")); // Log to a USB stick
+      } catch (Exception e) {
+        System.out.println("Exception " + e + " when opening WPILOGWriter. Did you insert a USB Stick?");
+      }
+      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+      pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
     } else {
-        setUseTiming(false); // Run as fast as possible
-        String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-        Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+      setUseTiming(false); // Run as fast as possible
+      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+      Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
     }
     
     // Logger.disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
