@@ -8,7 +8,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.wpilibj.SPI;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,19 +20,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
     public SwerveDriveOdometry swerveOdometry;
     public SwerveModule[] mSwerveMods;
     public AHRS navx;
+    public ChassisSpeeds robotChassisSpeeds;
     // public Pigeon2 gyro;
 
     public Swerve() {
         navx = new AHRS(SPI.Port.kMXP);
-        navx.calibrate();
-        zeroGyro();
 
         mSwerveMods = new SwerveModule[] {
             new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -43,48 +45,43 @@ public class Swerve extends SubsystemBase {
         Timer.delay(1.0);
         resetModulesToAbsolute();
 
-        swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
+        zeroGyro();
+
+        swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions(), new Pose2d(2, 2, getYaw()));
+
+        AutoBuilder.configureHolonomic(this::getPose, this::resetOdometry, 
+                                        () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates()),
+                                        this::driveToChasis,
+                                        Constants.autoConstants,
+                                        this);
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop, int maxSpeedMode) {
-        translation = translation.times(Constants.Swerve.maxSpeed[maxSpeedMode]);
+    /* Wrapper function that uses the Autonomous maxSpeedIndex for autonomous */
+    public void driveToChasis(ChassisSpeeds cSpeeds) {
+        driveToChasis(cSpeeds, Constants.Swerve.autonomousMaxSpeedIndex);
+    }
 
-        SwerveModuleState[] swerveModuleStates =
-            Constants.Swerve.swerveKinematics.toSwerveModuleStates(
-                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                                    translation.getX(), 
-                                    translation.getY(), 
-                                    rotation, 
-                                    getYaw()
-                                )
-                                : new ChassisSpeeds(
-                                    translation.getX(), 
-                                    translation.getY(), 
-                                    rotation)
-                                );
+    public void driveToChasis(ChassisSpeeds cSpeeds, int maxSpeedMode) {
+        SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(cSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed[maxSpeedMode]);
 
         for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop, maxSpeedMode);
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false, maxSpeedMode);
         }
+    }
 
-        SmartDashboard.putNumber("yaw", getYaw().getDegrees());
-        SmartDashboard.putNumber("translationX", translation.getX());
-        SmartDashboard.putNumber("translationY", translation.getY());
-        SmartDashboard.putNumber("rotation", rotation);
-
-        SmartDashboard.putBoolean("fieldOriented", fieldRelative);
-        SmartDashboard.putNumber("maxSpeed", Constants.Swerve.maxSpeed[maxSpeedMode]);
-    }    
-
-    /* Used by SwerveControllerCommand in Auto */
-    public void setModuleStates(SwerveModuleState[] desiredStates, int maxSpeedMode) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed[maxSpeedMode]);
-        
-        for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(desiredStates[mod.moduleNumber], false, 1);
-        }
-    }    
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop, int maxSpeedMode) {
+        driveToChasis(fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                        translation.getX(), 
+                        translation.getY(), 
+                        rotation, 
+                        getYaw())
+                      : new ChassisSpeeds(
+                          translation.getX(), 
+                          translation.getY(), 
+                          rotation)
+                      , maxSpeedMode);
+    }
 
     public Pose2d getPose() {
         return swerveOdometry.getPoseMeters();
@@ -126,12 +123,15 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic(){
-        swerveOdometry.update(getYaw(), getModulePositions());  
+        swerveOdometry.update(getYaw(), getModulePositions());
+        System.out.println(getPose().toString());
+        Logger.recordOutput("RobotPose", getPose());
+        Logger.recordOutput("Robot Module States", getModuleStates());
 
         for(SwerveModule mod : mSwerveMods){
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
+            Logger.recordOutput("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
+            Logger.recordOutput("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
+            Logger.recordOutput("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);  
         }
     }
 }
