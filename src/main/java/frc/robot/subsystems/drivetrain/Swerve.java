@@ -31,7 +31,6 @@ public class Swerve extends SubsystemBase {
 
     public SwerveModule[] mSwerveMods;
     public AHRS navx;
-    public ChassisSpeeds robotChassisSpeeds;
 
     public Swerve() {
         navx = new AHRS(SPI.Port.kMXP);
@@ -53,20 +52,20 @@ public class Swerve extends SubsystemBase {
 
         AutoBuilder.configureHolonomic(this::getPose, this::resetOdometry, 
                                         () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates()),
-                                        this::driveToChasis,
+                                        this::driveChassis,
                                         Constants.autoConstants,
                                         this);
 
         s_Vision = new Vision(Constants.Vision.cameraName, Constants.Vision.robotToCam, Constants.Vision.fieldLayout);
-        poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions(), new Pose2d(0, 0, getYaw()));
+        poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions(), Constants.initialPose);
     }
 
     /* Wrapper function that uses the Autonomous maxSpeedIndex for autonomous */
-    public void driveToChasis(ChassisSpeeds cSpeeds) {
-        driveToChasis(cSpeeds, Constants.Swerve.autonomousMaxSpeedIndex);
+    public void driveChassis(ChassisSpeeds cSpeeds) {
+        driveChassis(cSpeeds, Constants.Swerve.autonomousMaxSpeedIndex);
     }
 
-    public void driveToChasis(ChassisSpeeds cSpeeds, int maxSpeedMode) {
+    public void driveChassis(ChassisSpeeds cSpeeds, int maxSpeedMode) {
         SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(cSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed[maxSpeedMode]);
 
@@ -76,7 +75,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop, int maxSpeedMode) {
-        driveToChasis(fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
+        driveChassis(fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         translation.getX(), 
                         translation.getY(), 
                         rotation, 
@@ -136,7 +135,7 @@ public class Swerve extends SubsystemBase {
             poseEstimator.addVisionMeasurement(visionPose.get().estimatedPose.toPose2d(), visionPose.get().timestampSeconds);
         }
 
-        Logger.recordOutput("Odometry", getPose());
+        Logger.recordOutput("Composite Pose", getPose());
 
         Logger.recordOutput("Module States", getModuleStates());
     }
