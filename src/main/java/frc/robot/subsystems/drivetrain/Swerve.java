@@ -1,8 +1,9 @@
 package frc.robot.subsystems.drivetrain;
 
-import frc.robot.SwerveModule;
-import frc.robot.subsystems.Vision;
+import frc.lib.util.LocalADStarAK;
 import frc.robot.Constants;
+import frc.robot.subsystems.Vision;
+import frc.robot.SwerveModule;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -15,6 +16,8 @@ import org.photonvision.EstimatedRobotPose;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -55,6 +58,16 @@ public class Swerve extends SubsystemBase {
                                         this::driveChassis,
                                         Constants.autoConstants,
                                         this);
+        Pathfinding.setPathfinder(new LocalADStarAK());
+        PathPlannerLogging.setLogActivePathCallback(
+            (activePath) -> {
+            Logger.recordOutput(
+                "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+            });
+        PathPlannerLogging.setLogTargetPoseCallback(
+            (targetPose) -> {
+            Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+            });
 
         s_Vision = new Vision(Constants.Vision.cameraName, Constants.Vision.robotToCam, Constants.Vision.fieldLayout);
         poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions(), Constants.initialPose);
@@ -136,7 +149,6 @@ public class Swerve extends SubsystemBase {
         }
 
         Logger.recordOutput("Composite Pose", getPose());
-
         Logger.recordOutput("Module States", getModuleStates());
     }
 }
