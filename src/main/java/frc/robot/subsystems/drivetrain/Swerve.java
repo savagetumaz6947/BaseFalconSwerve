@@ -1,20 +1,23 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.drivetrain;
 
 import frc.robot.SwerveModule;
+import frc.robot.subsystems.Vision;
 import frc.robot.Constants;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
+import java.util.Optional;
+
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.wpilibj.SPI;
-
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -23,7 +26,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
-    public SwerveDriveOdometry swerveOdometry;
+    private Vision s_Vision;
+    public SwerveDrivePoseEstimator poseEstimator;
+
     public SwerveModule[] mSwerveMods;
     public AHRS navx;
     public ChassisSpeeds robotChassisSpeeds;
@@ -46,13 +51,14 @@ public class Swerve extends SubsystemBase {
 
         zeroGyro();
 
-        swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions(), new Pose2d(2, 2, getYaw()));
-
         AutoBuilder.configureHolonomic(this::getPose, this::resetOdometry, 
                                         () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates()),
                                         this::driveToChasis,
                                         Constants.autoConstants,
                                         this);
+
+        s_Vision = new Vision(Constants.Vision.cameraName, Constants.Vision.robotToCam, Constants.Vision.fieldLayout);
+        poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions(), new Pose2d(0, 0, getYaw()));
     }
 
     /* Wrapper function that uses the Autonomous maxSpeedIndex for autonomous */
@@ -83,11 +89,11 @@ public class Swerve extends SubsystemBase {
     }
 
     public Pose2d getPose() {
-        return swerveOdometry.getPoseMeters();
+        return poseEstimator.getEstimatedPosition();
     }
 
     public void resetOdometry(Pose2d pose) {
-        swerveOdometry.resetPosition(getYaw(), getModulePositions(), pose);
+        poseEstimator.resetPosition(getYaw(), getModulePositions(), pose);
     }
 
     public SwerveModuleState[] getModuleStates(){
@@ -122,15 +128,16 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic(){
-        swerveOdometry.update(getYaw(), getModulePositions());
-        System.out.println(getPose().toString());
-        Logger.recordOutput("RobotPose", getPose());
-        Logger.recordOutput("Robot Module States", getModuleStates());
+        poseEstimator.update(getYaw(), getModulePositions());
 
-        for(SwerveModule mod : mSwerveMods){
-            Logger.recordOutput("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
-            Logger.recordOutput("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
-            Logger.recordOutput("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);  
+        Optional<EstimatedRobotPose> visionPose = s_Vision.getEstimatedGlobalPose();
+        if (visionPose.isPresent()) {
+            Logger.recordOutput("Vision", visionPose.get());
+            poseEstimator.addVisionMeasurement(visionPose.get().estimatedPose.toPose2d(), visionPose.get().timestampSeconds);
         }
+
+        Logger.recordOutput("Odometry", getPose());
+
+        Logger.recordOutput("Module States", getModuleStates());
     }
 }
