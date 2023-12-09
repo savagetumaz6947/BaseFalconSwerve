@@ -31,6 +31,7 @@ public class Robot extends LoggedRobot {
 
   private RobotContainer m_robotContainer;
 
+  @SuppressWarnings("unused")
   private PowerDistribution pdh;
 
 
