@@ -14,6 +14,10 @@
     "**/.factorypath": true,
     "**/*~": true
   },
+  "todohighlight.isEnable": true,
+  "todohighlight.keywords": [
+    "24CHG",
+  ],
   "java.test.config": [
     {
       "name": "WPIlibUnitTests",
