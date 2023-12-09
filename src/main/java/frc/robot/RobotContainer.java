@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -61,6 +62,9 @@ public class RobotContainer {
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        // Register named commands
+        NamedCommands.registerCommand("printWait", new InstantCommand(() -> System.out.println("PathPlanner: Waiting")));
 
         // Configure the button bindings
         configureButtonBindings();
