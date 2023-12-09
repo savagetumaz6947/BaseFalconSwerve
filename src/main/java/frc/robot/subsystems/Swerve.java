@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.SwerveModule;
+import frc.lib.util.LocalADStarAK;
 import frc.robot.Constants;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -12,6 +13,8 @@ import org.littletonrobotics.junction.Logger;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.wpilibj.SPI;
 
@@ -53,6 +56,16 @@ public class Swerve extends SubsystemBase {
                                         this::driveToChasis,
                                         Constants.autoConstants,
                                         this);
+        Pathfinding.setPathfinder(new LocalADStarAK());
+        PathPlannerLogging.setLogActivePathCallback(
+            (activePath) -> {
+            Logger.recordOutput(
+                "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+            });
+        PathPlannerLogging.setLogTargetPoseCallback(
+            (targetPose) -> {
+            Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+            });
     }
 
     /* Wrapper function that uses the Autonomous maxSpeedIndex for autonomous */
@@ -124,8 +137,8 @@ public class Swerve extends SubsystemBase {
     public void periodic(){
         swerveOdometry.update(getYaw(), getModulePositions());
         System.out.println(getPose().toString());
-        Logger.recordOutput("RobotPose", getPose());
-        Logger.recordOutput("Robot Module States", getModuleStates());
+        Logger.recordOutput("Odometry/Robot Pose", getPose());
+        Logger.recordOutput("Odometry/Robot Module States", getModuleStates());
 
         for(SwerveModule mod : mSwerveMods){
             Logger.recordOutput("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
