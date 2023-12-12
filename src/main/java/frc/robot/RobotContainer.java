@@ -1,5 +1,7 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -59,6 +61,8 @@ public class RobotContainer {
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        Logger.recordOutput("AprilTagLayout", Constants.Vision.fieldLayout);
 
         // Register named commands
         NamedCommands.registerCommand("printWait", new InstantCommand(() -> System.out.println("PathPlanner: Waiting")));

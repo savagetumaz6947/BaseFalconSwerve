@@ -9,6 +9,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,16 +25,18 @@ public final class Constants {
     public static final double stickDeadband = 0.1;
 
     // Inital pose of the robot
-    public static Pose2d initialPose = new Pose2d(2, 2, new Rotation2d(0));
+    public static Pose2d initialPose = new Pose2d(14.8, 1.07, new Rotation2d(0));
 
     public static final class Vision {
-        public static final String cameraName = "limelight";
+        public static final String cameraName = "OV5647";
         // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
-        public static final Transform3d robotToCam = new Transform3d(new Translation3d(Constants.Swerve.wheelBase/2, 0.0, 0.23), new Rotation3d(0, 0.942478, 0));
+        public static final Transform3d robotToCam = new Transform3d(new Translation3d(Constants.Swerve.wheelBase/2, 0.0, 0.23), new Rotation3d(0, -0.942478, 0));
 
-        public static final AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(List.of(
-            new AprilTag(1, new Pose3d(1.5, 2, 0.5, new Rotation3d(0, 0, Math.PI)))
-        ), 16.4846, 8.1026);
+        // public static final AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(List.of(
+        //     new AprilTag(1, new Pose3d(1.5, 2, 0.5, new Rotation3d(0, 0, Math.PI)))
+        // ), 16.4846, 8.1026);
+
+        public static final AprilTagFieldLayout fieldLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
     }
 
     public static final class Swerve {
