@@ -29,7 +29,7 @@ public final class Constants {
     public static final class Vision {
         public static final String cameraName = "limelight";
         // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
-        public static final Transform3d robotToCam = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0));
+        public static final Transform3d robotToCam = new Transform3d(new Translation3d(Constants.Swerve.wheelBase/2, 0.0, 0.23), new Rotation3d(0, 0.942478, 0));
 
         public static final AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(List.of(
             new AprilTag(1, new Pose3d(1.5, 2, 0.5, new Rotation3d(0, 0, Math.PI)))
