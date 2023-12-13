@@ -5,14 +5,35 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
+
+    // Inital pose of the robot
+    public static Pose2d initialPose = new Pose2d(14.8, 1.07, new Rotation2d(0));
+
+    public static final class Vision {
+        public static final String cameraName = "OV5647";
+        // Cam mounted facing foward, 54 degrees up, at the front of the robot, 23cm up.
+        public static final Transform3d robotToCam = new Transform3d(new Translation3d(Constants.Swerve.wheelBase/2, 0.0, 0.23), new Rotation3d(0, -0.942478, 0));
+
+        // public static final AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(List.of(
+        //     new AprilTag(1, new Pose3d(1.5, 2, 0.5, new Rotation3d(0, 0, Math.PI)))
+        // ), 16.4846, 8.1026);
+
+        public static final AprilTagFieldLayout fieldLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
+    }
 
     public static final class Swerve {
         public static final boolean invertGyro = true; // Always ensure Gyro is CCW+ CW-
@@ -95,7 +116,7 @@ public final class Constants {
             public static final int driveMotorID = 11;
             public static final int angleMotorID = 12;
             public static final int canCoderID = 31;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(57.7); // TODO:
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(57.7);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }

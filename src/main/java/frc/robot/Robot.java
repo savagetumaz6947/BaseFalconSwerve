@@ -45,7 +45,7 @@ public class Robot extends LoggedRobot {
 
     if (isReal()) {
       try {
-        Logger.addDataReceiver(new WPILOGWriter("/U")); // Log to a USB stick
+        // Logger.addDataReceiver(new WPILOGWriter("/U")); // Log to a USB stick
       } catch (Exception e) {
         System.out.println("Exception " + e + " when opening WPILOGWriter. Did you insert a USB Stick?");
       }
