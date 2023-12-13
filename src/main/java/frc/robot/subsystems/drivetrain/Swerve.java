@@ -144,12 +144,12 @@ public class Swerve extends SubsystemBase {
 
         Optional<EstimatedRobotPose> visionPose = s_Vision.getEstimatedGlobalPose();
         if (visionPose.isPresent()) {
-            Logger.recordOutput("Vision", visionPose.get().estimatedPose);
-            Logger.recordOutput("Vision2d", visionPose.get().estimatedPose.toPose2d());
+            Logger.recordOutput("Odometry/Vision3d", visionPose.get().estimatedPose);
+            Logger.recordOutput("Odometry/Vision2d", visionPose.get().estimatedPose.toPose2d());
             poseEstimator.addVisionMeasurement(visionPose.get().estimatedPose.toPose2d(), visionPose.get().timestampSeconds);
         }
 
-        Logger.recordOutput("Composite Pose", getPose());
-        Logger.recordOutput("Module States", getModuleStates());
+        Logger.recordOutput("Odometry/Composite Pose", getPose());
+        Logger.recordOutput("Odometry/Module States", getModuleStates());
     }
 }
