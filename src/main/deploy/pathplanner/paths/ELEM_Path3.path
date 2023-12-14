@@ -1,0 +1,100 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 14.5,
+        "y": 1.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 14.897982510250731,
+        "y": 0.572589716608005
+      },
+      "isLocked": false
+    },
+    {
+      "anchor": {
+        "x": 13.280416560833123,
+        "y": 4.423255560796836
+      },
+      "prevControl": {
+        "x": 14.48794007855873,
+        "y": 3.985755560796836
+      },
+      "nextControl": {
+        "x": 12.072893043107516,
+        "y": 4.8607555607968385
+      },
+      "isLocked": false
+    },
+    {
+      "anchor": {
+        "x": 12.478790957581914,
+        "y": 1.14517943321601
+      },
+      "prevControl": {
+        "x": 12.348721259105464,
+        "y": 1.8631114438568166
+      },
+      "nextControl": {
+        "x": 12.608860656058365,
+        "y": 0.4272474225752023
+      },
+      "isLocked": false
+    },
+    {
+      "anchor": {
+        "x": 14.5,
+        "y": 1.0
+      },
+      "prevControl": {
+        "x": 14.250060795469265,
+        "y": 2.5000101313119716
+      },
+      "nextControl": null,
+      "isLocked": false
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6000000000000001,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 1.0499999999999998,
+      "rotationDegrees": 60.0
+    },
+    {
+      "waypointRelativePos": 1.9,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 3.0,
+      "constraints": {
+        "maxVelocity": 4.0,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    }
+  ],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 5.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": null
+}

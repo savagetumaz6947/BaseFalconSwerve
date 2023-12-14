@@ -84,15 +84,28 @@ public class RobotContainer {
         robotCentricToggleButton.toggleOnTrue(new InstantCommand(() -> robotCentric = !robotCentric));
         turboMode.onTrue(new InstantCommand(() -> maxSpeedMode = 2));
         turboMode.onFalse(new InstantCommand(() -> maxSpeedMode = 1));
-        new JoystickButton(driver, XboxController.Button.kA.value).toggleOnTrue(new InstantCommand(() -> {
-            new FollowPathHolonomic(
-                PathPlannerPath.fromPathFile(new File(Filesystem.getDeployDirectory(), "pathplanner/paths/InfRoute.path").toString()),
+        new JoystickButton(driver, XboxController.Button.kA.value).toggleOnTrue((new FollowPathHolonomic(
+                PathPlannerPath.fromPathFile(new File(Filesystem.getDeployDirectory(), "pathplanner/paths/ELEM_Path1.path").toString()),
                 s_Swerve::getPose,
                 () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates()),
                 s_Swerve::driveChassis,
                 Constants.autoConstants,
-            s_Swerve);
-        }));
+            s_Swerve).andThen(
+            new FollowPathHolonomic(
+                PathPlannerPath.fromPathFile(new File(Filesystem.getDeployDirectory(), "pathplanner/paths/ELEM_Path2.path").toString()),
+                s_Swerve::getPose,
+                () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates()),
+                s_Swerve::driveChassis,
+                Constants.autoConstants,
+            s_Swerve)).andThen(
+            new FollowPathHolonomic(
+                PathPlannerPath.fromPathFile(new File(Filesystem.getDeployDirectory(), "pathplanner/paths/ELEM_Path3.path").toString()),
+                s_Swerve::getPose,
+                () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates()),
+                s_Swerve::driveChassis,
+                Constants.autoConstants,
+            s_Swerve))).repeatedly()
+        );
     }
 
     /**
