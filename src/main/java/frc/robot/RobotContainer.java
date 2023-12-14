@@ -1,8 +1,13 @@
 package frc.robot;
 
+import java.io.File;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.FollowPathHolonomic;
+import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -79,6 +84,15 @@ public class RobotContainer {
         robotCentricToggleButton.toggleOnTrue(new InstantCommand(() -> robotCentric = !robotCentric));
         turboMode.onTrue(new InstantCommand(() -> maxSpeedMode = 2));
         turboMode.onFalse(new InstantCommand(() -> maxSpeedMode = 1));
+        new JoystickButton(driver, XboxController.Button.kA.value).toggleOnTrue(new InstantCommand(() -> {
+            new FollowPathHolonomic(
+                PathPlannerPath.fromPathFile(new File(Filesystem.getDeployDirectory(), "pathplanner/paths/InfRoute.path").toString()),
+                s_Swerve::getPose,
+                () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates()),
+                s_Swerve::driveChassis,
+                Constants.autoConstants,
+            s_Swerve);
+        }));
     }
 
     /**
