@@ -39,6 +39,8 @@ public class RobotContainer {
     private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton robotCentricToggleButton = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     private final JoystickButton turboMode = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
+    private final JoystickButton kA = new JoystickButton(driver, XboxController.Button.kA.value);
+    private final JoystickButton kB = new JoystickButton(driver, XboxController.Button.kB.value);
 
     private boolean robotCentric = true;
     private int maxSpeedMode = 1;
@@ -84,7 +86,7 @@ public class RobotContainer {
         robotCentricToggleButton.toggleOnTrue(new InstantCommand(() -> robotCentric = !robotCentric));
         turboMode.onTrue(new InstantCommand(() -> maxSpeedMode = 2));
         turboMode.onFalse(new InstantCommand(() -> maxSpeedMode = 1));
-        new JoystickButton(driver, XboxController.Button.kA.value).toggleOnTrue((new FollowPathHolonomic(
+        kA.toggleOnTrue((new FollowPathHolonomic(
                 PathPlannerPath.fromPathFile(new File(Filesystem.getDeployDirectory(), "pathplanner/paths/ELEM_Path1.path").toString()),
                 s_Swerve::getPose,
                 () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates()),
@@ -104,7 +106,7 @@ public class RobotContainer {
                 () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates()),
                 s_Swerve::driveChassis,
                 Constants.autoConstants,
-            s_Swerve))).repeatedly()
+            s_Swerve))).until(() -> kB.getAsBoolean()).repeatedly()
         );
     }
 
