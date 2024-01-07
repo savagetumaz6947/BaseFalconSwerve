@@ -68,29 +68,29 @@ public class Swerve extends SubsystemBase {
 
     /* Wrapper function that uses the Autonomous maxSpeedIndex for autonomous */
     public void driveChassis(ChassisSpeeds cSpeeds) {
-        driveChassis(cSpeeds, Constants.Swerve.autonomousMaxSpeedIndex);
+        driveChassis(cSpeeds, Constants.Swerve.autonomousMaxSpeedSelection);
     }
 
-    public void driveChassis(ChassisSpeeds cSpeeds, int maxSpeedMode) {
+    public void driveChassis(ChassisSpeeds cSpeeds, double maxSpeedSelection) {
         SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(cSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed[maxSpeedMode]);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeedSelection);
 
-        for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false, maxSpeedMode);
+        for (SwerveModule mod : mSwerveMods){
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber]);
         }
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop, int maxSpeedMode) {
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, double maxSpeedSelection) {
         driveChassis(fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                        translation.getX(), 
-                        translation.getY(), 
-                        rotation, 
+                        translation.getX(),
+                        translation.getY(),
+                        rotation,
                         getHeading())
                       : new ChassisSpeeds(
-                          translation.getX(), 
-                          translation.getY(), 
-                          rotation)
-                      , maxSpeedMode);
+                          translation.getX(),
+                          translation.getY(),
+                          rotation),
+                    maxSpeedSelection);
     }
 
     public void zeroGyro(){

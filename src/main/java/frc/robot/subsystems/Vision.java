@@ -22,7 +22,6 @@ public class Vision {
      * @param robotToCam The location of the camera relative to the robot center
      */
     public Vision(String cameraName, Transform3d robotToCam) {
-        // 24CHG: Change to 2024 field when avaliable
         this(cameraName, robotToCam, AprilTagFields.k2024Crescendo.loadAprilTagLayoutField());
     }
 

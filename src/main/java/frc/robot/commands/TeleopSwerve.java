@@ -45,8 +45,7 @@ public class TeleopSwerve extends Command {
             new Translation2d(translationVal, strafeVal), 
             rotationVal * Constants.Swerve.maxAngularVelocity, 
             !robotCentricSup.getAsBoolean(), 
-            true,
-            maxSpeedMode.getAsInt()
+            Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]
         );
     }
 }

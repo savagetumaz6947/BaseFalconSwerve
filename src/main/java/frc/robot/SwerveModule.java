@@ -48,15 +48,15 @@ public class SwerveModule {
         mDriveMotor.getConfigurator().setPosition(0.0);
     }
 
-    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, int maxSpeedMode){
+    public void setDesiredState(SwerveModuleState desiredState){
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle); 
         mAngleMotor.setControl(anglePosition.withPosition(desiredState.angle.getRotations()));
-        setSpeed(desiredState, isOpenLoop, maxSpeedMode);
+        setSpeed(desiredState);
     }
 
-    private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop, int maxSpeedMode){
-        if(isOpenLoop){
-            driveDutyCycle.Output = desiredState.speedMetersPerSecond / Constants.Swerve.maxSpeed[maxSpeedMode];
+    private void setSpeed(SwerveModuleState desiredState){
+        if (Constants.Swerve.isOpenLoop){
+            driveDutyCycle.Output = desiredState.speedMetersPerSecond / Constants.Swerve.maxSpeed;
             mDriveMotor.setControl(driveDutyCycle);
         }
         else {
