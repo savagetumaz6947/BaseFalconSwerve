@@ -1,6 +1,8 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -14,7 +16,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import frc.lib.util.COTSFalconSwerveConstants;
+import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
 public final class Constants {
@@ -38,8 +40,8 @@ public final class Constants {
     public static final class Swerve {
         public static final boolean invertGyro = true; // Always ensure Gyro is CCW+ CW-
 
-        public static final COTSFalconSwerveConstants chosenModule =
-            COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L2);
+        public static final COTSTalonFXSwerveConstants chosenModule =
+            COTSTalonFXSwerveConstants.SDS.MK4i.Falcon500(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L2);
 
         /* Drivetrain Constants */
         public static final double trackWidth = 0.595;
@@ -59,21 +61,21 @@ public final class Constants {
         public static final double angleGearRatio = chosenModule.angleGearRatio;
 
         /* Motor Inverts */
-        public static final boolean angleMotorInvert = chosenModule.angleMotorInvert;
-        public static final boolean driveMotorInvert = chosenModule.driveMotorInvert;
+        public static final InvertedValue angleMotorInvert = chosenModule.angleMotorInvert;
+        public static final InvertedValue driveMotorInvert = chosenModule.driveMotorInvert;
 
         /* Angle Encoder Invert */
-        public static final boolean canCoderInvert = chosenModule.canCoderInvert;
+        public static final SensorDirectionValue cancoderInvert = chosenModule.cancoderInvert;
 
         /* Swerve Current Limiting */
-        public static final int angleContinuousCurrentLimit = 25;
-        public static final int anglePeakCurrentLimit = 40;
-        public static final double anglePeakCurrentDuration = 0.1;
+        public static final int angleCurrentLimit = 25;
+        public static final int angleCurrentThreshold = 40;
+        public static final double angleCurrentThresholdTime = 0.1;
         public static final boolean angleEnableCurrentLimit = true;
 
-        public static final int driveContinuousCurrentLimit = 35;
-        public static final int drivePeakCurrentLimit = 60;
-        public static final double drivePeakCurrentDuration = 0.1;
+        public static final int driveCurrentLimit = 35;
+        public static final int driveCurrentThreshold = 60;
+        public static final double driveCurrentThresholdTime = 0.1;
         public static final boolean driveEnableCurrentLimit = true;
 
         /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
@@ -85,7 +87,6 @@ public final class Constants {
         public static final double angleKP = chosenModule.angleKP;
         public static final double angleKI = chosenModule.angleKI;
         public static final double angleKD = chosenModule.angleKD;
-        public static final double angleKF = chosenModule.angleKF;
 
         /* Drive Motor PID Values */
         public static final double driveKP = 0.13; //TODO: This must be tuned to specific robot
@@ -93,11 +94,10 @@ public final class Constants {
         public static final double driveKD = 0.075;
         public static final double driveKF = 0.0;
 
-        /* Drive Motor Characterization Values 
-         * Divide SYSID values by 12 to convert from volts to percent output for CTRE */
-        public static final double driveKS = (0.32 / 12); //TODO: This must be tuned to specific robot
-        public static final double driveKV = (1.51 / 12);
-        public static final double driveKA = (0.27 / 12);
+        /* Drive Motor Characterization Values */
+        public static final double driveKS = 0.32; //TODO: This must be tuned to specific robot
+        public static final double driveKV = 1.51;
+        public static final double driveKA = 0.27;
 
         /* Swerve Profiling Values */
         /** Meters per Second */
@@ -107,8 +107,8 @@ public final class Constants {
         public static final double maxAngularVelocity = 5.0; //TODO: This must be tuned to specific robot
 
         /* Neutral Modes */
-        public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
-        public static final NeutralMode driveNeutralMode = NeutralMode.Brake;
+        public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
+        public static final NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
 
         /* Module Specific Constants */
         /* Front Left Module - Module 0 */

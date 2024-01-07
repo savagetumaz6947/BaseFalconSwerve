@@ -25,7 +25,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
@@ -45,15 +44,9 @@ public class Swerve extends SubsystemBase {
             new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
 
-        /* By pausing init for a second before setting module offsets, we avoid a bug with inverting motors.
-         * See https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
-         */
-        Timer.delay(1.0);
-        resetModulesToAbsolute();
-
         zeroGyro();
 
-        AutoBuilder.configureHolonomic(this::getPose, this::resetOdometry, 
+        AutoBuilder.configureHolonomic(this::getPose, this::setPose, 
                                         () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates()),
                                         this::driveChassis,
                                         Constants.autoConstants,
@@ -70,7 +63,7 @@ public class Swerve extends SubsystemBase {
             });
 
         s_Vision = new Vision(Constants.Vision.cameraName, Constants.Vision.robotToCam, Constants.Vision.fieldLayout);
-        poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions(), Constants.initialPose);
+        poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions(), Constants.initialPose);
     }
 
     /* Wrapper function that uses the Autonomous maxSpeedIndex for autonomous */
@@ -92,7 +85,7 @@ public class Swerve extends SubsystemBase {
                         translation.getX(), 
                         translation.getY(), 
                         rotation, 
-                        getYaw())
+                        getHeading())
                       : new ChassisSpeeds(
                           translation.getX(), 
                           translation.getY(), 
@@ -100,13 +93,34 @@ public class Swerve extends SubsystemBase {
                       , maxSpeedMode);
     }
 
+    public void zeroGyro(){
+        navx.reset();
+    }
+
+    public Rotation2d getGyroYaw() {
+        return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - (navx.getYaw() < 0 ? (navx.getYaw()+360)%360 : navx.getYaw())) : Rotation2d.fromDegrees((navx.getYaw() < 0 ? (navx.getYaw()+360)%360 : navx.getYaw()));
+    }
+
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
     }
 
-    public void resetOdometry(Pose2d pose) {
-        poseEstimator.resetPosition(getYaw(), getModulePositions(), pose);
+    public Rotation2d getHeading() {
+        return getPose().getRotation();
     }
+
+    public void setPose(Pose2d pose) {
+        poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), pose);
+    }
+
+    public void setHeading(Rotation2d heading){
+        poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
+    }
+
+    public void zeroHeading(){
+        poseEstimator.resetPosition(getGyroYaw(), getModulePositions(), new Pose2d(getPose().getTranslation(), new Rotation2d()));
+    }
+
 
     public SwerveModuleState[] getModuleStates(){
         SwerveModuleState[] states = new SwerveModuleState[4];
@@ -124,13 +138,6 @@ public class Swerve extends SubsystemBase {
         return positions;
     }
 
-    public void zeroGyro(){
-        navx.reset();
-    }
-
-    public Rotation2d getYaw() {
-        return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - (navx.getYaw() < 0 ? (navx.getYaw()+360)%360 : navx.getYaw())) : Rotation2d.fromDegrees((navx.getYaw() < 0 ? (navx.getYaw()+360)%360 : navx.getYaw()));
-    }
 
     public void resetModulesToAbsolute(){
         for(SwerveModule mod : mSwerveMods){
@@ -140,7 +147,7 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic(){
-        poseEstimator.update(getYaw(), getModulePositions());
+        poseEstimator.update(getGyroYaw(), getModulePositions());
 
         Optional<EstimatedRobotPose> visionPose = s_Vision.getEstimatedGlobalPose();
         if (visionPose.isPresent()) {

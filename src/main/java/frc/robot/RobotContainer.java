@@ -75,7 +75,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
-        zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+        zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         robotCentricToggleButton.toggleOnTrue(new InstantCommand(() -> robotCentric = !robotCentric));
         turboMode.onTrue(new InstantCommand(() -> maxSpeedMode = 2));
         turboMode.onFalse(new InstantCommand(() -> maxSpeedMode = 1));
