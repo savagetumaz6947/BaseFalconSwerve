@@ -6,7 +6,6 @@ import frc.robot.subsystems.Vision;
 import frc.robot.SwerveModule;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
 import java.util.Optional;
@@ -19,7 +18,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -50,6 +51,7 @@ public class Swerve extends SubsystemBase {
                                         () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates()),
                                         this::driveChassis,
                                         Constants.autoConstants,
+                                        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                                         this);
         Pathfinding.setPathfinder(new LocalADStarAK());
         PathPlannerLogging.setLogActivePathCallback(
@@ -73,7 +75,9 @@ public class Swerve extends SubsystemBase {
 
     public void driveChassis(ChassisSpeeds cSpeeds, double maxSpeedSelection) {
         SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(cSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeedSelection);
+        for (SwerveModuleState s : swerveModuleStates) {
+            s.speedMetersPerSecond *= maxSpeedSelection;
+        }
 
         for (SwerveModule mod : mSwerveMods){
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber]);

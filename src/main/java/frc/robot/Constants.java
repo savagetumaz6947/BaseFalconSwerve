@@ -101,9 +101,9 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 2.4;  // TODO: This must be tuned to specific robot / This is the theoretical maxSpeed of your robot (aka the 100% value)
+        public static final double maxSpeed = 4.5;  // TODO: This must be tuned to specific robot / This is the theoretical maxSpeed of your robot (aka the 100% value)
                                                         //   You can ignore this value if "isOpenLoop" is set to FALSE
-        public static final double[] speedSelection = {1.3, 1.8, 2.36}; //TODO: You can set this to your desired speed
+        public static final double[] speedSelection = {1.3, 1.8, 4.5}; //TODO: You can set this to your desired speed
         public static final double autonomousMaxSpeedSelection  = 1.8; // This refers to the index of the speedSelection defined on top by speedSelection[] used by Autonomous mode
         /** Radians per Second */
         public static final double maxAngularVelocity = 5.0; //TODO: This must be tuned to specific robot
