@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends LoggedRobot {
-  public static CTREConfigs ctreConfigs;
+  public static final CTREConfigs ctreConfigs = new CTREConfigs();
 
   private Command m_autonomousCommand;
 
@@ -45,9 +45,9 @@ public class Robot extends LoggedRobot {
 
     if (isReal()) {
       try {
-        // Logger.addDataReceiver(new WPILOGWriter("/U")); // Log to a USB stick
+        Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick (FAT32 formatted, "/U/logs")
       } catch (Exception e) {
-        System.out.println("Exception " + e + " when opening WPILOGWriter. Did you insert a USB Stick?");
+        System.out.println("Exception " + e + " when opening WPILOGWriter. Did you insert a FAT32 formatted USB Stick?");
       }
       Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
       pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
@@ -61,7 +61,6 @@ public class Robot extends LoggedRobot {
     // Logger.disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
-    ctreConfigs = new CTREConfigs();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();

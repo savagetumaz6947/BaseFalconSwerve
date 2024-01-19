@@ -31,7 +31,7 @@ public class RobotContainer {
     private final int rotationAxis = XboxController.Axis.kRightX.value;
 
     /* Driver Buttons */
-    private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
+    private final JoystickButton zeroHeading = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton robotCentricToggleButton = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     private final JoystickButton turboMode = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
 
@@ -75,7 +75,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
-        zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+        zeroHeading.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         robotCentricToggleButton.toggleOnTrue(new InstantCommand(() -> robotCentric = !robotCentric));
         turboMode.onTrue(new InstantCommand(() -> maxSpeedMode = 2));
         turboMode.onFalse(new InstantCommand(() -> maxSpeedMode = 1));

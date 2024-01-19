@@ -9,6 +9,7 @@ import java.util.function.IntSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 
@@ -40,13 +41,14 @@ public class TeleopSwerve extends Command {
         double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
         double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
 
+        SmartDashboard.putNumber("maxSpeedMode", maxSpeedMode.getAsInt());
+
         /* Drive */
         s_Swerve.drive(
             new Translation2d(translationVal, strafeVal), 
             rotationVal * Constants.Swerve.maxAngularVelocity, 
-            !robotCentricSup.getAsBoolean(), 
-            true,
-            maxSpeedMode.getAsInt()
+            robotCentricSup.getAsBoolean(), 
+            Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]
         );
     }
 }

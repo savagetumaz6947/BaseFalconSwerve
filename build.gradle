@@ -120,8 +120,8 @@ configurations.all {
 }
 
 // TODO: uncomment this when AKit updates to 2024-1.1
-// task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
-//     mainClass = "org.littletonrobotics.junction.CheckInstall"
-//     classpath = sourceSets.main.runtimeClasspath
-// }
-// compileJava.finalizedBy checkAkitInstall
+task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
+    mainClass = "org.littletonrobotics.junction.CheckInstall"
+    classpath = sourceSets.main.runtimeClasspath
+}
+compileJava.finalizedBy checkAkitInstall
