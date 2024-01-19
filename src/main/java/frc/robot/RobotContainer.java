@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.commands.*;
+import frc.robot.subsystems.TestRev;
 import frc.robot.subsystems.drivetrain.Swerve;
 
 /**
@@ -29,6 +30,7 @@ public class RobotContainer {
     private final int translationAxis = XboxController.Axis.kLeftY.value;
     private final int strafeAxis = XboxController.Axis.kLeftX.value;
     private final int rotationAxis = XboxController.Axis.kRightX.value;
+    private final int testAxis = XboxController.Axis.kLeftTrigger.value;
 
     /* Driver Buttons */
     private final JoystickButton zeroHeading = new JoystickButton(driver, XboxController.Button.kY.value);
@@ -40,6 +42,7 @@ public class RobotContainer {
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
+    private final TestRev testRev = new TestRev();
 
     // private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");
     private final SendableChooser<Command> autoChooser;
@@ -56,6 +59,11 @@ public class RobotContainer {
                 () -> maxSpeedMode
             )
         );
+        
+        testRev.setDefaultCommand(new TestRevCmd(
+            testRev,
+            () -> driver.getRawAxis(testAxis)
+        ));
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
