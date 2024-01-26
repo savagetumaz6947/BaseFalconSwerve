@@ -3,6 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -12,9 +13,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-import frc.robot.commands.*;
-import frc.robot.subsystems.TestRev;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.drivetrain.Swerve;
+import frc.robot.subsystems.AngleSys;
+import frc.robot.subsystems.BottomIntake;
+import frc.robot.subsystems.MidIntake;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -27,43 +30,58 @@ public class RobotContainer {
     private final Joystick driver = new Joystick(0);
 
     /* Drive Controls */
-    private final int translationAxis = XboxController.Axis.kLeftY.value;
-    private final int strafeAxis = XboxController.Axis.kLeftX.value;
-    private final int rotationAxis = XboxController.Axis.kRightX.value;
-    private final int testAxis = XboxController.Axis.kLeftTrigger.value;
+    // private final int intakeAxis = XboxController.Axis.kLeftY.value;
+    // private final int strafeAxis = XboxController.Axis.kLeftX.value;
+    // private final int rotationAxis = XboxController.Axis.kRightX.value;
+    private final int intakeBAxis = XboxController.Axis.kLeftY.value;
+    private final int intakeMAxis = XboxController.Axis.kRightY.value;
+    private final int angleAxis = XboxController.Axis.kLeftTrigger.value;
 
     /* Driver Buttons */
-    private final JoystickButton zeroHeading = new JoystickButton(driver, XboxController.Button.kY.value);
-    private final JoystickButton robotCentricToggleButton = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
-    private final JoystickButton turboMode = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
+    private final JoystickButton kA = new JoystickButton(driver, XboxController.Button.kA.value);
+    private final JoystickButton kB = new JoystickButton(driver, XboxController.Button.kB.value);
+    private final JoystickButton kY = new JoystickButton(driver, XboxController.Button.kY.value);
+    private final JoystickButton kX = new JoystickButton(driver, XboxController.Button.kX.value);
+    // private final JoystickButton kLeftBumper = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+    // private final JoystickButton kRightBumper = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
 
-    private boolean robotCentric = true;
-    private int maxSpeedMode = 1;
+    // private boolean robotCentric = true;
+    // private int maxSpeedMode = 1;
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
-    private final TestRev testRev = new TestRev();
+    private final MidIntake midIntake = new MidIntake();
+    private final BottomIntake bottomIntake = new BottomIntake();
+    private final Shooter shooter = new Shooter();
+    private final AngleSys angle = new AngleSys();
 
     // private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");
     private final SendableChooser<Command> autoChooser;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
-        s_Swerve.setDefaultCommand(
-            new TeleopSwerve(
-                s_Swerve, 
-                () -> -driver.getRawAxis(translationAxis), 
-                () -> -driver.getRawAxis(strafeAxis), 
-                () -> -driver.getRawAxis(rotationAxis), 
-                () -> robotCentric,
-                () -> maxSpeedMode
-            )
-        );
+        // s_Swerve.setDefaultCommand(
+        //     new TeleopSwerve(
+        //         s_Swerve, 
+        //         () -> -driver.getRawAxis(translationAxis), 
+        //         () -> -driver.getRawAxis(strafeAxis), 
+        //         () -> -driver.getRawAxis(rotationAxis), 
+        //         () -> robotCentric,
+        //         () -> maxSpeedMode
+        //     )
+        // );
         
-        testRev.setDefaultCommand(new TestRevCmd(
-            testRev,
-            () -> driver.getRawAxis(testAxis)
-        ));
+        // intake.setDefaultCommand(new TestRevCmd(
+        //     testRev,
+        //     () -> driver.getRawAxis(testAxis)
+        // ));
+        // testRev.setDefaultCommand(new InstantCommand(() -> {
+        //     testRev.move(driver.getRawAxis(intakeAxis))
+        // }));
+        midIntake.setDefaultCommand(new InstantCommand(() -> midIntake.moveMid(driver.getRawAxis(intakeMAxis)), midIntake));
+        bottomIntake.setDefaultCommand(new InstantCommand(() -> bottomIntake.moveDown(driver.getRawAxis(intakeBAxis)), bottomIntake));
+        angle.setDefaultCommand(new InstantCommand(() -> angle.move(driver.getRawAxis(angleAxis)), angle));
+
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -83,10 +101,16 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
-        zeroHeading.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
-        robotCentricToggleButton.toggleOnTrue(new InstantCommand(() -> robotCentric = !robotCentric));
-        turboMode.onTrue(new InstantCommand(() -> maxSpeedMode = 2));
-        turboMode.onFalse(new InstantCommand(() -> maxSpeedMode = 1));
+        // zeroHeading.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
+        // robotCentricToggleButton.toggleOnTrue(new InstantCommand(() -> robotCentric = !robotCentric));
+        // turboMode.onTrue(new InstantCommand(() -> maxSpeedMode = 2));
+        // turboMode.onFalse(new InstantCommand(() -> maxSpeedMode = 1));
+        kA.onTrue(new InstantCommand(() -> shooter.shoot(), shooter).repeatedly());
+        kB.onTrue(new InstantCommand(() -> shooter.stop(), shooter).repeatedly());
+        kY.onTrue(new InstantCommand(() -> midIntake.moveMid(-.5), midIntake).repeatedly().until(() -> midIntake.getColor().red >= 0.37).andThen(
+            new InstantCommand(() -> midIntake.moveMid(0.3), midIntake).repeatedly().withTimeout(0.15)
+        ).finallyDo(() -> midIntake.moveMid(0)));
+        kX.onTrue(new InstantCommand(() -> midIntake.moveMid(0), midIntake));
     }
 
     /**
