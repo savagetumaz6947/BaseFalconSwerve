@@ -4,7 +4,7 @@ import frc.lib.util.LocalADStarAK;
 import frc.robot.Constants;
 import frc.robot.subsystems.Vision;
 import frc.robot.SwerveModule;
-
+import frc.robot.Constants.GameObjects.BlueAlliance;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
@@ -21,6 +21,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -65,7 +66,7 @@ public class Swerve extends SubsystemBase {
             });
 
         s_Vision = new Vision(Constants.Vision.cameraName, Constants.Vision.robotToCam, Constants.Vision.fieldLayout);
-        poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions(), Constants.initialPose);
+        poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions(), Constants.initialPose, VecBuilder.fill(0.9, 0.9, 0.9), VecBuilder.fill(0.1, 0.1, 0.1));
     }
 
     /* Wrapper function that uses the Autonomous maxSpeedIndex for autonomous */
@@ -149,6 +150,30 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    /**
+     * This function returns the shortest distance in 2D between the robot and the speaker of the robot's alliance.
+     * @return The distance in 2D between the pose and the speaker
+     */
+    public double getDistToSpeaker() {
+        Pose2d pose = getPose();
+        if (DriverStation.getAlliance().get() == Alliance.Blue)
+            return Math.sqrt(Math.pow(pose.getX() - Constants.GameObjects.BlueAlliance.speaker.getX(),2) + 
+                                Math.pow(pose.getY() - Constants.GameObjects.BlueAlliance.speaker.getY(), 2));
+        else
+            return Math.sqrt(Math.pow(pose.getX() - Constants.GameObjects.RedAlliance.speaker.getX(),2) + 
+                                Math.pow(pose.getY() - Constants.GameObjects.RedAlliance.speaker.getY(), 2));
+    }
+
+    public double getAngleToSpeaker() {
+        Pose2d pose = getPose();
+        if (DriverStation.getAlliance().get() == Alliance.Blue)
+            return Math.atan((pose.getY() - Constants.GameObjects.BlueAlliance.speaker.getY()) / 
+                                (pose.getX() - Constants.GameObjects.BlueAlliance.speaker.getX()));
+        else
+            return Math.PI + Math.atan((pose.getY() - Constants.GameObjects.RedAlliance.speaker.getY()) / 
+                                (pose.getX() - Constants.GameObjects.RedAlliance.speaker.getX()));
+    }
+
     @Override
     public void periodic(){
         poseEstimator.update(getGyroYaw(), getModulePositions());
@@ -162,5 +187,7 @@ public class Swerve extends SubsystemBase {
 
         Logger.recordOutput("Odometry/Composite Pose", getPose());
         Logger.recordOutput("Odometry/Module States", getModuleStates());
+
+        Logger.recordOutput("Odometry/Dist to Speaker", getDistToSpeaker());
     }
 }
