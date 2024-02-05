@@ -5,7 +5,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,13 +19,12 @@ import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.drivetrain.Swerve;
 import frc.lib.util.DeadzoneJoystick;
 import frc.robot.commands.TeleopSwerve;
-import frc.robot.commands.Angle.AutoRiseToAngle;
 import frc.robot.commands.Angle.RiseToAngle;
 import frc.robot.commands.Intake.AutoAimNote;
 import frc.robot.commands.Shooting.AutoAimToShoot;
 import frc.robot.subsystems.AngleSys;
 import frc.robot.subsystems.BottomIntake;
-import frc.robot.subsystems.Hang;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.MidIntake;
 
 /**
@@ -75,7 +73,7 @@ public class RobotContainer {
     private final BottomIntake bottomIntake = new BottomIntake();
     private final Shooter shooter = new Shooter();
     private final AngleSys angle = new AngleSys();
-    private final Hang hang = new Hang();
+    private final Climber climber = new Climber();
 
     private final Vision intakeCam = new Vision("IntakeCam");
 
@@ -124,7 +122,7 @@ public class RobotContainer {
         // bottomIntake.setDefaultCommand(new InstantCommand(() -> bottomIntake.moveDown(driver.getRawAxis(intakeBAxis)), bottomIntake));
         angle.setDefaultCommand(new InstantCommand(() -> angle.move(driver.getPOV() == 0 ? 1 : (driver.getPOV() == 180 ? -1 : 0)), angle));
         // angle.setDefaultCommand(new AutoRiseToAngle(angle, s_Swerve));
-        hang.setDefaultCommand(new InstantCommand(() -> hang.move(operator.getRawAxis(leftHangAxis), operator.getRawAxis(rightHangAxis)), hang));
+        climber.setDefaultCommand(new InstantCommand(() -> climber.move(operator.getRawAxis(leftHangAxis), operator.getRawAxis(rightHangAxis)), climber));
 
         // Register named commands
         NamedCommands.registerCommand("printWait", new InstantCommand(() -> System.out.println("PathPlanner: Waiting")));

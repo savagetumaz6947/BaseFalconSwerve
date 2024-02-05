@@ -1,7 +1,5 @@
 package frc.robot.commands.Intake;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
@@ -10,7 +8,7 @@ import frc.robot.subsystems.drivetrain.Swerve;
 
 public class AutoAimNote extends PIDCommand {
     public AutoAimNote(Swerve swerve, Vision intakeVision) {
-        super(new PIDController(0.02, 0.015, 0.005),
+        super(new PIDController(0.02, 0.015, 0.005), // TODO: tune PID values
             () -> {
                 if (intakeVision.hasTargets() == false) {
                     return 0;
@@ -19,8 +17,8 @@ public class AutoAimNote extends PIDCommand {
                 }
             },
             0,
-            (double omega_per_second) -> {
-                swerve.driveChassis(new ChassisSpeeds(0, 0, omega_per_second));
+            (double vyMetersPerSecond) -> {
+                swerve.driveChassis(new ChassisSpeeds(0, vyMetersPerSecond, 0));
             },
             swerve
         );
