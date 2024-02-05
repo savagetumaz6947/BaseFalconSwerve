@@ -8,18 +8,6 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ToMidNote"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "ToAmpNote"
           }
         },
@@ -32,13 +20,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ToStageNote"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
+            "pathName": "ToNote1"
           }
         }
       ]

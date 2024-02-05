@@ -5,18 +5,35 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drivetrain.Swerve;
 
 public class Shooter extends SubsystemBase {
     private CANSparkMax up = new CANSparkMax(62, MotorType.kBrushless);
     private CANSparkMax down = new CANSparkMax(61, MotorType.kBrushless);
 
-    public Shooter() {
+    private Swerve swerve;
+
+    public Shooter(Swerve swerve) {
         down.follow(up, true);
+        this.swerve = swerve;
     }
 
     public void shoot() {
         up.set(-1);
+    }
+
+    public Command idle() {
+        return new InstantCommand(() -> {
+            if (swerve.getDistToSpeaker() < 3.5) {
+                up.set(-0.3);
+            } else {
+                up.set(0);
+            }
+            // up.set(0);
+        }, this);
     }
 
     public void stop() {

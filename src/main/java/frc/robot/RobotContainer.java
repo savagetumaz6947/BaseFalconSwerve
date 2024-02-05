@@ -5,7 +5,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,14 +13,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.drivetrain.Swerve;
 import frc.lib.util.DeadzoneJoystick;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.Angle.AutoRiseToAngle;
-import frc.robot.commands.Angle.RiseToAngle;
 import frc.robot.commands.Intake.AutoAimNote;
 import frc.robot.commands.Shooting.AutoAimToShoot;
 import frc.robot.subsystems.AngleSys;
@@ -44,10 +42,6 @@ public class RobotContainer {
     private final int translationAxis = XboxController.Axis.kLeftY.value;
     private final int strafeAxis = XboxController.Axis.kLeftX.value;
     private final int rotationAxis = XboxController.Axis.kRightX.value;
-    // private final int intakeBAxis = XboxController.Axis.kLeftY.value;
-    // private final int intakeMAxis = XboxController.Axis.kRightY.value;
-    // private final int angleDAxis = XboxController.Axis.kLeftTrigger.value;
-    // private final int angleUAxis = XboxController.Axis.kRightTrigger.value;
 
     /* Driver Buttons */
     private final JoystickButton startShooterButton = new JoystickButton(driver, XboxController.Button.kA.value);
@@ -63,8 +57,10 @@ public class RobotContainer {
     private final int leftHangAxis = XboxController.Axis.kLeftY.value;
     private final int rightHangAxis = XboxController.Axis.kRightY.value;
 
-    // private final JoystickButton kLeftBumper = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
-    // private final JoystickButton kRightBumper = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
+    /* Operator Buttons */
+    private final Trigger manualAngleUp = new Trigger(() -> (operator.getPOV() == 0));
+    private final Trigger manualAngleDown = new Trigger(() -> (operator.getPOV() == 180));
+    private final JoystickButton resetAngle = new JoystickButton(operator, XboxController.Button.kA.value);
 
     private boolean robotCentric = true;
     private int maxSpeedMode = 1;
@@ -73,7 +69,7 @@ public class RobotContainer {
     private final Swerve s_Swerve = new Swerve();
     private final MidIntake midIntake = new MidIntake();
     private final BottomIntake bottomIntake = new BottomIntake();
-    private final Shooter shooter = new Shooter();
+    private final Shooter shooter = new Shooter(s_Swerve);
     private final AngleSys angle = new AngleSys();
     private final Hang hang = new Hang();
 
@@ -81,16 +77,8 @@ public class RobotContainer {
 
     public final Command pickUpNoteCommand = new InstantCommand(() -> {
             midIntake.moveMid(-.7);
-            bottomIntake.moveDown(0.25);
+            bottomIntake.moveDown(0.5);
         }, midIntake, bottomIntake).repeatedly().until(() -> midIntake.getColor().red >= 0.32).finallyDo(() -> {
-            // new InstantCommand(() -> {
-            //     midIntake.moveMid(0.3);
-            // }, midIntake).repeatedly().withTimeout(0.15).alongWith(new InstantCommand(() -> {
-            //     bottomIntake.moveDown(0);
-            // }, bottomIntake).finallyDo(() -> {
-            //     midIntake.moveMid(0);
-            //     bottomIntake.moveDown(0);
-            // }))
             bottomIntake.moveDown(0);
             midIntake.moveMid(0);
         });
@@ -103,8 +91,8 @@ public class RobotContainer {
                 , s_Swerve).repeatedly()),
             new InstantCommand(() -> s_Swerve.driveChassis(new ChassisSpeeds(0, 0, 0)), s_Swerve)
         );
+    public final AutoRiseToAngle autoRiseToAngleCommand = new AutoRiseToAngle(angle, s_Swerve);
 
-    // private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");
     private final SendableChooser<Command> autoChooser;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -122,23 +110,23 @@ public class RobotContainer {
 
         midIntake.setDefaultCommand(new InstantCommand(() -> midIntake.moveMid(driver.getPOV() == 270 ? 1 : (driver.getPOV() == 90 ? -1 : 0)), midIntake));
         // bottomIntake.setDefaultCommand(new InstantCommand(() -> bottomIntake.moveDown(driver.getRawAxis(intakeBAxis)), bottomIntake));
-        angle.setDefaultCommand(new InstantCommand(() -> angle.move(driver.getPOV() == 0 ? 1 : (driver.getPOV() == 180 ? -1 : 0)), angle));
+        // angle.setDefaultCommand(new InstantCommand(() -> angle.move(driver.getPOV() == 0 ? 0.5 : (driver.getPOV() == 180 ? -0.5 : 0)), angle));
+        shooter.setDefaultCommand(shooter.idle());
+        angle.setDefaultCommand(autoRiseToAngleCommand);
         // angle.setDefaultCommand(new AutoRiseToAngle(angle, s_Swerve));
         hang.setDefaultCommand(new InstantCommand(() -> hang.move(operator.getRawAxis(leftHangAxis), operator.getRawAxis(rightHangAxis)), hang));
 
         // Register named commands
-        NamedCommands.registerCommand("printWait", new InstantCommand(() -> System.out.println("PathPlanner: Waiting")));
         NamedCommands.registerCommand("PickUpNote", pickUpNoteCommand);
-        NamedCommands.registerCommand("ShootAtMidNote", new ParallelDeadlineGroup(
+        NamedCommands.registerCommand("Shoot", new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new RiseToAngle(37.5, angle),
+                new InstantCommand(() -> {
+                    System.out.println("waiting for finish (autoRise: " + autoRiseToAngleCommand.isFinished() + ")");
+                }).repeatedly().onlyWhile(() -> autoRiseToAngleCommand.isFinished()),
                 new InstantCommand(() -> midIntake.moveMid(-1), midIntake).repeatedly().withTimeout(1)
             ),
             new InstantCommand(() -> shooter.shoot(), shooter).repeatedly()
-        ).andThen(new InstantCommand(() -> {
-            midIntake.moveMid(0);
-            shooter.stop();
-        })));
+        ));
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -155,27 +143,12 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
-        // zeroHeading.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
-        // robotCentricToggleButton.toggleOnTrue(new InstantCommand(() -> robotCentric = !robotCentric));
-        // turboMode.onTrue(new InstantCommand(() -> maxSpeedMode = 2));
-        // turboMode.onFalse(new InstantCommand(() -> maxSpeedMode = 1));
         startShooterButton.onTrue(new InstantCommand(() -> shooter.shoot(), shooter).repeatedly());
-        stopShooterButton.onTrue(new InstantCommand(() -> shooter.stop(), shooter).repeatedly());
-        // kY.onTrue(new InstantCommand(() -> midIntake.moveMid(-.7), midIntake).repeatedly().until(() -> midIntake.getColor().red >= 0.32).andThen(
-        //     new InstantCommand(() -> midIntake.moveMid(0.3), midIntake).repeatedly().withTimeout(0.15)
-        // ).finallyDo(() -> midIntake.moveMid(0)));
+        stopShooterButton.onTrue(new InstantCommand(() -> shooter.idle(), shooter));
         startPickupButton.onTrue(new InstantCommand(() -> {
             midIntake.moveMid(-.7);
             bottomIntake.moveDown(0.4);
         }, midIntake, bottomIntake).repeatedly().until(() -> midIntake.getColor().red >= 0.32).finallyDo(() -> {
-            // new InstantCommand(() -> {
-            //     midIntake.moveMid(0.3);
-            // }, midIntake).repeatedly().withTimeout(0.15).alongWith(new InstantCommand(() -> {
-            //     bottomIntake.moveDown(0);
-            // }, bottomIntake).finallyDo(() -> {
-            //     midIntake.moveMid(0);
-            //     bottomIntake.moveDown(0);
-            // }))
             bottomIntake.moveDown(0);
             midIntake.moveMid(0);
         }));
@@ -183,12 +156,14 @@ public class RobotContainer {
             midIntake.moveMid(0);
             bottomIntake.moveDown(0);
         }, midIntake, bottomIntake));
-        // kLeftBumper.whileTrue(new MoveToAngle(60, angle));
-        // kLeftBumper.whileTrue(new AutoAimNote(s_Swerve, intakeCam));
         kLeftBumper.onTrue(new AutoAimToShoot(s_Swerve));
         eStopSwerve.onTrue(new InstantCommand(() -> {}, s_Swerve));
         zeroSwerveButton.whileTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
-        autoPickupButton.whileTrue(autoGrabNoteCommand);
+        autoPickupButton.onTrue(autoGrabNoteCommand);
+
+        manualAngleUp.whileTrue(new InstantCommand(() -> angle.move(0.5), angle).repeatedly());
+        manualAngleDown.whileTrue(new InstantCommand(() -> angle.move(-0.5), angle).repeatedly());
+        resetAngle.onTrue(new InstantCommand(() -> angle.reset()));
     }
 
     /**

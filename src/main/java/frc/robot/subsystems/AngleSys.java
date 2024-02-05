@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.MusicTone;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkMax;
@@ -48,10 +49,7 @@ public class AngleSys extends SubsystemBase {
      * @return
      */
     public double getAutoAngle(double dist) {
-        // if (dist < 2.5) return ; // Refer to Google Sheets
-        // return 34;
-        return 0;
-        // return (58.5 - 10.5 * dist) >= 28 ? 58.5 - 10.5 * dist : 34;
+        return (55.2 - 6.09 * dist) >= 29 ? 55.2 - 6.09 * dist : 29; // Refer to Google Sheets
     }
 
     public void move(double val) {
@@ -65,6 +63,11 @@ public class AngleSys extends SubsystemBase {
             leftMotor.setControl(stopRequest);
             rightMotor.setControl(stopRequest);
         }
+    }
+
+    public void reset() {
+        encoder.setPosition(0);
+        leftMotor.setControl(new MusicTone(442));
     }
 
     @Override

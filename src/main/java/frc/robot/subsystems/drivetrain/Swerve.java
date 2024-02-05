@@ -4,7 +4,6 @@ import frc.lib.util.LocalADStarAK;
 import frc.robot.Constants;
 import frc.robot.subsystems.Vision;
 import frc.robot.SwerveModule;
-import frc.robot.Constants.GameObjects.BlueAlliance;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 

@@ -1,7 +1,5 @@
 package frc.robot.commands.Intake;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
@@ -12,10 +10,10 @@ public class AutoAimNote extends PIDCommand {
     public AutoAimNote(Swerve swerve, Vision intakeVision) {
         super(new PIDController(0.02, 0.015, 0.005),
             () -> {
-                if (intakeVision.hasTargets() == false) {
-                    return 0;
-                } else {
+                if (intakeVision.hasTargets()) {
                     return intakeVision.getBestTarget().getYaw();
+                } else {
+                    return 0;
                 }
             },
             0,

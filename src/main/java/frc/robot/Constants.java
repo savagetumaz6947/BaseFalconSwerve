@@ -117,7 +117,7 @@ public final class Constants {
         public static final double[] speedSelection = {1.3, 1.8, 4.5}; //TODO: You can set this to your desired speed
         public static final double autonomousMaxSpeedSelection  = 1; // This refers to the index of the speedSelection defined on top by speedSelection[] used by Autonomous mode
         /** Radians per Second */
-        public static final double maxAngularVelocity = 5.0; //TODO: This must be tuned to specific robot
+        public static final double maxAngularVelocity = 3.0; //TODO: This must be tuned to specific robot
 
         /* Neutral Modes */
         public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
