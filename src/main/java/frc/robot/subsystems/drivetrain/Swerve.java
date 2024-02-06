@@ -47,6 +47,9 @@ public class Swerve extends SubsystemBase {
 
         zeroGyro();
 
+        s_Vision = new Vision(Constants.Vision.cameraName, Constants.Vision.robotToCam, Constants.Vision.fieldLayout);
+        poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions(), Constants.initialPose, VecBuilder.fill(0.9, 0.9, 0.9), VecBuilder.fill(0.1, 0.1, 0.1));
+
         AutoBuilder.configureHolonomic(this::getPose, this::setPose, 
                                         () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates()),
                                         this::driveChassis,
@@ -63,9 +66,6 @@ public class Swerve extends SubsystemBase {
             (targetPose) -> {
             Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
             });
-
-        s_Vision = new Vision(Constants.Vision.cameraName, Constants.Vision.robotToCam, Constants.Vision.fieldLayout);
-        poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions(), Constants.initialPose, VecBuilder.fill(0.9, 0.9, 0.9), VecBuilder.fill(0.1, 0.1, 0.1));
     }
 
     /* Wrapper function that uses the Autonomous maxSpeedIndex for autonomous */

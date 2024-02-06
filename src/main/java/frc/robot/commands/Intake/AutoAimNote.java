@@ -8,7 +8,7 @@ import frc.robot.subsystems.drivetrain.Swerve;
 
 public class AutoAimNote extends PIDCommand {
     public AutoAimNote(Swerve swerve, Vision intakeVision) {
-        super(new PIDController(0.02, 0.015, 0.005),
+        super(new PIDController(0.02, 0.015, 0.005), // TODO: tune PID values
             () -> {
                 if (intakeVision.hasTargets()) {
                     return intakeVision.getBestTarget().getYaw();
@@ -17,8 +17,8 @@ public class AutoAimNote extends PIDCommand {
                 }
             },
             0,
-            (double omega_per_second) -> {
-                swerve.driveChassis(new ChassisSpeeds(0, 0, omega_per_second));
+            (double vyMetersPerSecond) -> {
+                swerve.driveChassis(new ChassisSpeeds(0, vyMetersPerSecond, 0));
             },
             swerve
         );

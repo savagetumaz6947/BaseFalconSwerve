@@ -24,7 +24,7 @@ import frc.robot.commands.Intake.AutoAimNote;
 import frc.robot.commands.Shooting.AutoAimToShoot;
 import frc.robot.subsystems.AngleSys;
 import frc.robot.subsystems.BottomIntake;
-import frc.robot.subsystems.Hang;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.MidIntake;
 
 /**
@@ -71,7 +71,7 @@ public class RobotContainer {
     private final BottomIntake bottomIntake = new BottomIntake();
     private final Shooter shooter = new Shooter(s_Swerve);
     private final AngleSys angle = new AngleSys();
-    private final Hang hang = new Hang();
+    private final Climber climber = new Climber();
 
     private final Vision intakeCam = new Vision("IntakeCam");
 
@@ -114,7 +114,7 @@ public class RobotContainer {
         shooter.setDefaultCommand(shooter.idle());
         angle.setDefaultCommand(autoRiseToAngleCommand);
         // angle.setDefaultCommand(new AutoRiseToAngle(angle, s_Swerve));
-        hang.setDefaultCommand(new InstantCommand(() -> hang.move(operator.getRawAxis(leftHangAxis), operator.getRawAxis(rightHangAxis)), hang));
+        climber.setDefaultCommand(new InstantCommand(() -> climber.move(operator.getRawAxis(leftHangAxis), operator.getRawAxis(rightHangAxis)), climber));
 
         // Register named commands
         NamedCommands.registerCommand("PickUpNote", pickUpNoteCommand);

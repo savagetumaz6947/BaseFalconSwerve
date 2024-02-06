@@ -8,11 +8,11 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Hang extends SubsystemBase {
+public class Climber extends SubsystemBase {
     private TalonFX leftMotor = new TalonFX(51, "canivore");
     private TalonFX rightMotor = new TalonFX(52, "canivore");
 
-    public Hang () {
+    public Climber () {
         var leftConfig = leftMotor.getConfigurator();
         var rightConfig = rightMotor.getConfigurator();
         var motorConfigs = new MotorOutputConfigs();
