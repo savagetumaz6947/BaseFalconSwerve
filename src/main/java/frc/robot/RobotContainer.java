@@ -2,6 +2,8 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -20,6 +22,7 @@ import frc.robot.subsystems.drivetrain.Swerve;
 import frc.lib.util.DeadzoneJoystick;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.Angle.AutoRiseToAngle;
+import frc.robot.commands.Angle.RiseToAngle;
 import frc.robot.commands.Intake.AutoAimNote;
 import frc.robot.commands.Shooting.AutoAimToShoot;
 import frc.robot.subsystems.AngleSys;
@@ -61,6 +64,7 @@ public class RobotContainer {
     private final Trigger manualAngleUp = new Trigger(() -> (operator.getPOV() == 0));
     private final Trigger manualAngleDown = new Trigger(() -> (operator.getPOV() == 180));
     private final JoystickButton resetAngle = new JoystickButton(operator, XboxController.Button.kA.value);
+    private final JoystickButton driveToTrap = new JoystickButton(operator, XboxController.Button.kB.value);
 
     private boolean robotCentric = true;
     private int maxSpeedMode = 1;
@@ -72,6 +76,9 @@ public class RobotContainer {
     private final Shooter shooter = new Shooter(s_Swerve);
     private final AngleSys angle = new AngleSys();
     private final Climber climber = new Climber();
+
+    private final RiseToAngle riseToTrapAngle = new RiseToAngle(() -> 50, angle);
+    private final RiseToAngle riseToAmpPosAngle = new RiseToAngle(() -> 36.734, angle);
 
     private final Vision intakeCam = new Vision("IntakeCam");
 
@@ -112,7 +119,7 @@ public class RobotContainer {
         // bottomIntake.setDefaultCommand(new InstantCommand(() -> bottomIntake.moveDown(driver.getRawAxis(intakeBAxis)), bottomIntake));
         // angle.setDefaultCommand(new InstantCommand(() -> angle.move(driver.getPOV() == 0 ? 0.5 : (driver.getPOV() == 180 ? -0.5 : 0)), angle));
         shooter.setDefaultCommand(shooter.idle());
-        angle.setDefaultCommand(autoRiseToAngleCommand);
+        angle.setDefaultCommand(autoRiseToAngleCommand.repeatedly());
         // angle.setDefaultCommand(new AutoRiseToAngle(angle, s_Swerve));
         climber.setDefaultCommand(new InstantCommand(() -> climber.move(operator.getRawAxis(leftHangAxis), operator.getRawAxis(rightHangAxis)), climber));
 
@@ -122,11 +129,14 @@ public class RobotContainer {
             new SequentialCommandGroup(
                 new InstantCommand(() -> {
                     System.out.println("waiting for finish (autoRise: " + autoRiseToAngleCommand.isFinished() + ")");
-                }).repeatedly().onlyWhile(() -> autoRiseToAngleCommand.isFinished()),
+                }).repeatedly().until(() -> autoRiseToAngleCommand.isFinished()).withTimeout(3),
                 new InstantCommand(() -> midIntake.moveMid(-1), midIntake).repeatedly().withTimeout(1)
             ),
+            new AutoAimToShoot(s_Swerve),
             new InstantCommand(() -> shooter.shoot(), shooter).repeatedly()
-        ));
+        ).finallyDo(() -> shooter.idle()));
+        NamedCommands.registerCommand("RiseToAngleAtAmpPos", riseToAmpPosAngle);
+        // NamedCommands.registerCommand("ShooterReady", new InstantCommand(() -> shooter.shoot(), shooter).repeatedly());
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -164,6 +174,25 @@ public class RobotContainer {
         manualAngleUp.whileTrue(new InstantCommand(() -> angle.move(0.5), angle).repeatedly());
         manualAngleDown.whileTrue(new InstantCommand(() -> angle.move(-0.5), angle).repeatedly());
         resetAngle.onTrue(new InstantCommand(() -> angle.reset()));
+
+        driveToTrap.onTrue(
+            // riseToTrapAngle.repeatedly()
+            new ParallelDeadlineGroup(
+                new SequentialCommandGroup(
+                    // AutoBuilder.pathfindToPose(new Pose2d(4.17, 5.303, new Rotation2d(2.041)), new PathConstraints(1.5, 5, 360, 720)),
+                    AutoBuilder.pathfindThenFollowPath(
+                        PathPlannerPath.fromPathFile("ToTrap1"), new PathConstraints(1.5, 5, 360, 720)),
+                    new InstantCommand(() -> {
+                        System.out.println("Waiting for angle... (" + riseToTrapAngle.isFinished() + ")");
+                    }).repeatedly().until(() -> riseToTrapAngle.isFinished()),
+                    new InstantCommand(() -> midIntake.moveMid(-1), midIntake).repeatedly().withTimeout(1)
+                ),
+                riseToTrapAngle.repeatedly(),
+                new InstantCommand(() -> shooter.shoot(), shooter).repeatedly()
+            ).finallyDo(() -> midIntake.moveMid(0))
+
+        );
+
     }
 
     /**

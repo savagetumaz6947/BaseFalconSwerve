@@ -28,7 +28,7 @@ public class Shooter extends SubsystemBase {
     public Command idle() {
         return new InstantCommand(() -> {
             if (swerve.getDistToSpeaker() < 3.5) {
-                up.set(-0.3);
+                up.set(-0.2);
             } else {
                 up.set(0);
             }

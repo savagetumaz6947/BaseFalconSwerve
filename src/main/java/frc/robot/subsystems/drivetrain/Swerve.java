@@ -5,6 +5,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.Vision;
 import frc.robot.SwerveModule;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
 import java.util.Optional;
@@ -75,9 +76,7 @@ public class Swerve extends SubsystemBase {
 
     public void driveChassis(ChassisSpeeds cSpeeds, double maxSpeedSelection) {
         SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(cSpeeds);
-        for (SwerveModuleState s : swerveModuleStates) {
-            s.speedMetersPerSecond *= maxSpeedSelection;
-        }
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeedSelection);
 
         for (SwerveModule mod : mSwerveMods){
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber]);

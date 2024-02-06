@@ -19,7 +19,8 @@ public class AngleSys extends SubsystemBase {
     private TalonFX leftMotor = new TalonFX(41, "canivore");
     private TalonFX rightMotor = new TalonFX(42, "canivore");
     private CANSparkMax sparkMaxEncoderOnly = new CANSparkMax(43, MotorType.kBrushed);
-    private DigitalInput limitSwitch = new DigitalInput(9);
+    private DigitalInput downLimit = new DigitalInput(9);
+    private DigitalInput upLimit = new DigitalInput(8);
     // private TalonSRX srxEncoderOnly = new TalonSRX(43);
     private RelativeEncoder encoder;
 
@@ -49,11 +50,14 @@ public class AngleSys extends SubsystemBase {
      * @return
      */
     public double getAutoAngle(double dist) {
-        return (55.2 - 6.09 * dist) >= 29 ? 55.2 - 6.09 * dist : 29; // Refer to Google Sheets
+        double value = (55.2 - 6.09 * dist);
+        if (value < 29) return 29;
+        else if (value > 60) return 60;
+        return value; // Refer to Google Sheets
     }
 
     public void move(double val) {
-        if (limitSwitch.get() || val > 0) {
+        if ((downLimit.get() && val < 0) || (upLimit.get() && val > 0)) {
             final DutyCycleOut lRequest = new DutyCycleOut(-val * 0.5);
             final DutyCycleOut rRequest = new DutyCycleOut(val * 0.5);
             leftMotor.setControl(lRequest);
@@ -63,6 +67,16 @@ public class AngleSys extends SubsystemBase {
             leftMotor.setControl(stopRequest);
             rightMotor.setControl(stopRequest);
         }
+        // if ((downLimit.get() && val < 0) || (upLimit.get() && val > 0)) {
+        //     final DutyCycleOut stopRequest = new DutyCycleOut(0);
+        //     leftMotor.setControl(stopRequest);
+        //     rightMotor.setControl(stopRequest);
+        // } else {
+        //     final DutyCycleOut lRequest = new DutyCycleOut(-val * 0.5);
+        //     final DutyCycleOut rRequest = new DutyCycleOut(val * 0.5);
+        //     leftMotor.setControl(lRequest);
+        //     rightMotor.setControl(rRequest);
+        // }
     }
 
     public void reset() {
@@ -74,6 +88,7 @@ public class AngleSys extends SubsystemBase {
     public void periodic() {
         Logger.recordOutput("AngleSys/EncoderPos", encoder.getPosition());
         Logger.recordOutput("AngleSys/EncoderAngleDeg", getAngle());
-        Logger.recordOutput("AngleSys/Limit", limitSwitch.get());
+        Logger.recordOutput("AngleSys/DownLimit", downLimit.get());
+        Logger.recordOutput("AngleSys/UpLimit", upLimit.get());
     }
 }
