@@ -114,10 +114,10 @@ public final class Constants {
         /** Meters per Second */
         public static final double maxSpeed = 4.5;  // TODO: This must be tuned to specific robot / This is the theoretical maxSpeed of your robot (aka the 100% value)
                                                         //   You can ignore this value if "isOpenLoop" is set to FALSE
-        public static final double[] speedSelection = {1.3, 1.8, 4.5}; //TODO: You can set this to your desired speed
+        public static final double[] speedSelection = {1.3, 2.5, 4.5}; //TODO: You can set this to your desired speed
         public static final double autonomousMaxSpeedSelection  = 4.5; // This refers to the index of the speedSelection defined on top by speedSelection[] used by Autonomous mode
         /** Radians per Second */
-        public static final double maxAngularVelocity = 3.0; //TODO: This must be tuned to specific robot
+        public static final double maxAngularVelocity = 6; //TODO: This must be tuned to specific robot
 
         /* Neutral Modes */
         public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
@@ -169,7 +169,7 @@ public final class Constants {
     }
 
     public static final HolonomicPathFollowerConfig autoConstants = new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-        new PIDConstants(5.0, .05, 0.0), // Translation PID constants
+        new PIDConstants(2.5, 0, 0.05), // Translation PID constants
         new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
         Swerve.autonomousMaxSpeedSelection, // Max module speed, in m/s
         Math.sqrt(Math.pow(Swerve.wheelBase / 2, 2) + Math.pow(Swerve.trackWidth / 2, 2)), // Drive base radius in meters. Distance from robot center to furthest module.

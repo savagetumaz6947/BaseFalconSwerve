@@ -32,12 +32,15 @@ public class Shooter extends SubsystemBase {
             } else {
                 up.set(0);
             }
-            // up.set(0);
         }, this);
     }
 
-    public void stop() {
-        up.set(0);
+    public void revIdle() {
+        up.set(0.3);
+    }
+
+    public boolean rpmOk() {
+        return up.getEncoder().getVelocity() <= -4500;
     }
 
     @Override

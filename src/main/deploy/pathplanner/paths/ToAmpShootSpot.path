@@ -16,30 +16,30 @@
     },
     {
       "anchor": {
-        "x": 3.9434193968031708,
-        "y": 6.922939429921391
+        "x": 2.6453682536994707,
+        "y": 6.841080348827365
       },
       "prevControl": {
-        "x": 4.925728369968126,
-        "y": 7.08665759211555
+        "x": 3.6276772268644257,
+        "y": 7.004798511021524
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "AmpShootSpot"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.25,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 240.0,
     "maxAngularAcceleration": 240.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 19.35,
+    "rotation": 31.492625629862754,
     "rotateFast": true
   },
   "reversed": false,

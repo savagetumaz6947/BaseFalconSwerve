@@ -47,13 +47,12 @@ public class RobotContainer {
     private final int rotationAxis = XboxController.Axis.kRightX.value;
 
     /* Driver Buttons */
-    private final JoystickButton startShooterButton = new JoystickButton(driver, XboxController.Button.kA.value);
-    private final JoystickButton stopShooterButton = new JoystickButton(driver, XboxController.Button.kB.value);
-    private final JoystickButton startPickupButton = new JoystickButton(driver, XboxController.Button.kY.value);
-    private final JoystickButton stopPickupButton = new JoystickButton(driver, XboxController.Button.kX.value);
-    private final JoystickButton kLeftBumper = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
-    private final JoystickButton eStopSwerve = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
-    private final JoystickButton autoPickupButton = new JoystickButton(driver, XboxController.Button.kBack.value);
+    private final Trigger autoPickupButton = new Trigger(() -> {
+        return driver.getRawAxis(XboxController.Axis.kRightTrigger.value) > 0.8;
+    });
+    private final JoystickButton autoDriveToAmpPos = new JoystickButton(driver, XboxController.Button.kX.value);
+    private final JoystickButton autoShootButton = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
+    private final JoystickButton driverCancelSwerve = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     private final JoystickButton zeroSwerveButton = new JoystickButton(driver, XboxController.Button.kStart.value);
 
     /* Operator Controls */
@@ -63,8 +62,13 @@ public class RobotContainer {
     /* Operator Buttons */
     private final Trigger manualAngleUp = new Trigger(() -> (operator.getPOV() == 0));
     private final Trigger manualAngleDown = new Trigger(() -> (operator.getPOV() == 180));
-    private final JoystickButton resetAngle = new JoystickButton(operator, XboxController.Button.kA.value);
-    private final JoystickButton driveToTrap = new JoystickButton(operator, XboxController.Button.kB.value);
+    private final JoystickButton resetAngle = new JoystickButton(operator, XboxController.Button.kStart.value);
+    private final JoystickButton driveToTrap = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
+    private final JoystickButton startShooterButton = new JoystickButton(operator, XboxController.Button.kA.value);
+    private final JoystickButton stopShooterButton = new JoystickButton(operator, XboxController.Button.kB.value);
+    private final JoystickButton startPickupButton = new JoystickButton(operator, XboxController.Button.kY.value);
+    private final JoystickButton stopPickupButton = new JoystickButton(operator, XboxController.Button.kX.value);
+    private final JoystickButton operatorCancelSwerve = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
 
     private boolean robotCentric = true;
     private int maxSpeedMode = 1;
@@ -81,6 +85,8 @@ public class RobotContainer {
     private final RiseToAngle riseToAmpPosAngle = new RiseToAngle(() -> 36.734, angle);
 
     private final Vision intakeCam = new Vision("IntakeCam");
+
+    private final Command autoAimToShootCommand = new AutoAimToShoot(s_Swerve);
 
     public final Command pickUpNoteCommand = new InstantCommand(() -> {
             midIntake.moveMid(-.7);
@@ -99,6 +105,40 @@ public class RobotContainer {
             new InstantCommand(() -> s_Swerve.driveChassis(new ChassisSpeeds(0, 0, 0)), s_Swerve)
         );
     public final AutoRiseToAngle autoRiseToAngleCommand = new AutoRiseToAngle(angle, s_Swerve);
+    public final Command dropIntake = new InstantCommand(() -> {
+        midIntake.moveMid(-1);
+        angle.move(0);
+        bottomIntake.moveDown(0);
+        shooter.revIdle();
+    }, bottomIntake, midIntake, angle, shooter).repeatedly().withTimeout(0.3).andThen(
+        new SequentialCommandGroup(
+            new InstantCommand(() -> midIntake.moveMid(1), midIntake).repeatedly().withTimeout(0.3),
+            new ParallelDeadlineGroup(
+                new SequentialCommandGroup(
+                    new InstantCommand(() -> midIntake.moveMid(0), midIntake),
+                    new InstantCommand(() -> System.out.println("waiting for shooter...")).repeatedly().until(() -> shooter.rpmOk()).withTimeout(3),
+                    new InstantCommand(() -> midIntake.moveMid(-1), midIntake).repeatedly().withTimeout(1)
+                ),
+                new InstantCommand(() -> shooter.shoot(), shooter).repeatedly()
+            ).andThen(shooter.idle())
+        )
+    );
+    public final Command shootCommand = new ParallelDeadlineGroup(
+            new SequentialCommandGroup(
+                new InstantCommand(() -> {
+                    System.out.println("waiting for finish (autoRise: " + autoRiseToAngleCommand.isFinished() + ")");
+                }).repeatedly().until(() -> autoRiseToAngleCommand.isFinished()).withTimeout(2),
+                new InstantCommand(() -> {
+                    System.out.println("waiting for rpm (rpm: " + shooter.rpmOk() + ")");
+                }).repeatedly().until(() -> shooter.rpmOk()).withTimeout(2),
+                new InstantCommand(() -> {
+                    System.out.println("waiting for aimtoshoot (aimtoshoot: " + autoAimToShootCommand.isFinished() + ")");
+                }).repeatedly().until(() -> autoAimToShootCommand.isFinished()).withTimeout(2),
+                new InstantCommand(() -> midIntake.moveMid(-1), midIntake).repeatedly().withTimeout(1)
+            ),
+            autoAimToShootCommand,
+            new InstantCommand(() -> shooter.shoot(), shooter).repeatedly()
+        ).finallyDo(() -> shooter.idle());
 
     private final SendableChooser<Command> autoChooser;
 
@@ -125,17 +165,8 @@ public class RobotContainer {
 
         // Register named commands
         NamedCommands.registerCommand("PickUpNote", pickUpNoteCommand);
-        NamedCommands.registerCommand("Shoot", new ParallelDeadlineGroup(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    System.out.println("waiting for finish (autoRise: " + autoRiseToAngleCommand.isFinished() + ")");
-                }).repeatedly().until(() -> autoRiseToAngleCommand.isFinished()).withTimeout(3),
-                new InstantCommand(() -> midIntake.moveMid(-1), midIntake).repeatedly().withTimeout(1)
-            ),
-            new AutoAimToShoot(s_Swerve),
-            new InstantCommand(() -> shooter.shoot(), shooter).repeatedly()
-        ).finallyDo(() -> shooter.idle()));
-        NamedCommands.registerCommand("RiseToAngleAtAmpPos", riseToAmpPosAngle);
+        NamedCommands.registerCommand("Shoot", shootCommand);
+        NamedCommands.registerCommand("RiseToAngleAtAmpPos", riseToAmpPosAngle.repeatedly());
         // NamedCommands.registerCommand("ShooterReady", new InstantCommand(() -> shooter.shoot(), shooter).repeatedly());
 
         autoChooser = AutoBuilder.buildAutoChooser();
@@ -153,7 +184,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
-        startShooterButton.onTrue(new InstantCommand(() -> shooter.shoot(), shooter).repeatedly());
+        startShooterButton.onTrue(new InstantCommand(() -> shooter.shoot(), shooter));
         stopShooterButton.onTrue(new InstantCommand(() -> shooter.idle(), shooter));
         startPickupButton.onTrue(new InstantCommand(() -> {
             midIntake.moveMid(-.7);
@@ -166,8 +197,11 @@ public class RobotContainer {
             midIntake.moveMid(0);
             bottomIntake.moveDown(0);
         }, midIntake, bottomIntake));
-        kLeftBumper.onTrue(new AutoAimToShoot(s_Swerve));
-        eStopSwerve.onTrue(new InstantCommand(() -> {}, s_Swerve));
+        autoShootButton.onTrue(shootCommand);
+        autoDriveToAmpPos.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToAmpShootSpot"), new PathConstraints(2.5, 5, 360, 720)));
+        // kLeftBumper.onTrue(dropIntake);
+        operatorCancelSwerve.onTrue(new InstantCommand(() -> {}, s_Swerve));
+        driverCancelSwerve.onTrue(new InstantCommand(() -> {}, s_Swerve));
         zeroSwerveButton.whileTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         autoPickupButton.onTrue(autoGrabNoteCommand);
 

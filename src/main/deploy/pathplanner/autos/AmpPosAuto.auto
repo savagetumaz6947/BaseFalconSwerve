@@ -16,7 +16,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "ToAmpNote"
+                        "pathName": "ToAmpFirstShootSpot"
                       }
                     },
                     {
@@ -26,9 +26,47 @@
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "race",
                       "data": {
-                        "pathName": "ToNote1"
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "ToAmpNote"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "PickUpNote"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Shoot"
+                      }
+                    },
+                    {
+                      "type": "race",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "ToNote1"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "PickUpNote"
+                            }
+                          }
+                        ]
                       }
                     },
                     {
@@ -44,9 +82,22 @@
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "race",
                       "data": {
-                        "pathName": "ToNote2"
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "ToNote2"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "PickUpNote"
+                            }
+                          }
+                        ]
                       }
                     },
                     {
@@ -62,12 +113,6 @@
                       }
                     }
                   ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "RiseToAngleAtAmpPos"
                 }
               }
             ]
