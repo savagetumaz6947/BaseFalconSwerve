@@ -45,7 +45,7 @@ public class TeleopSwerve extends Command {
 
         /* Drive */
         s_Swerve.drive(
-            new Translation2d(translationVal, strafeVal), 
+            new Translation2d(translationVal * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()], strafeVal * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]), 
             rotationVal * Constants.Swerve.maxAngularVelocity, 
             robotCentricSup.getAsBoolean(), 
             Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]

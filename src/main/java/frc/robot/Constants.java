@@ -10,6 +10,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -23,18 +24,28 @@ public final class Constants {
     public static final double stickDeadband = 0.1;
 
     // Inital pose of the robot
-    public static Pose2d initialPose = new Pose2d(14.8, 1.07, new Rotation2d(0));
+    public static Pose2d initialPose = new Pose2d(1.24, 5.57, new Rotation2d(0));
 
     public static final class Vision {
-        public static final String cameraName = "OV5647";
+        public static final String cameraName = "BackCamera";
         // Cam mounted facing foward, 54 degrees up, at the front of the robot, 23cm up.
-        public static final Transform3d robotToCam = new Transform3d(new Translation3d(Constants.Swerve.wheelBase/2, 0.0, 0.23), new Rotation3d(0, -0.942478, 0));
+        public static final Transform3d robotToCam = new Transform3d(new Translation3d(-0.03-0.36,0,0.455), new Rotation3d(0, Math.toRadians(65.9-90),Math.PI));
+        // public static final Transform3d robotToCam = new Transform3d(new Translation3d(0,0,0), new Rotation3d(0, 0, 0));
 
         // public static final AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(List.of(
         //     new AprilTag(1, new Pose3d(1.5, 2, 0.5, new Rotation3d(0, 0, Math.PI)))
         // ), 16.4846, 8.1026);
 
-        public static final AprilTagFieldLayout fieldLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
+        public static final AprilTagFieldLayout fieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    }
+
+    public static final class GameObjects {
+        public static final class BlueAlliance {
+            public static final Pose3d speaker = new Pose3d(0, 5.54, 2.05, new Rotation3d());
+        }
+        public static final class RedAlliance {
+            public static final Pose3d speaker = new Pose3d(16.54, 5.54, 2.05, new Rotation3d(Math.PI, 0, 0));
+        }
     }
 
     public static final class Swerve {
@@ -103,10 +114,10 @@ public final class Constants {
         /** Meters per Second */
         public static final double maxSpeed = 4.5;  // TODO: This must be tuned to specific robot / This is the theoretical maxSpeed of your robot (aka the 100% value)
                                                         //   You can ignore this value if "isOpenLoop" is set to FALSE
-        public static final double[] speedSelection = {1.3, 1.8, 4.5}; //TODO: You can set this to your desired speed
-        public static final double autonomousMaxSpeedSelection  = 1.8; // This refers to the index of the speedSelection defined on top by speedSelection[] used by Autonomous mode
+        public static final double[] speedSelection = {1.3, 2.5, 4.5}; //TODO: You can set this to your desired speed
+        public static final double autonomousMaxSpeedSelection  = 4.5; // This refers to the index of the speedSelection defined on top by speedSelection[] used by Autonomous mode
         /** Radians per Second */
-        public static final double maxAngularVelocity = 5.0; //TODO: This must be tuned to specific robot
+        public static final double maxAngularVelocity = 6; //TODO: This must be tuned to specific robot
 
         /* Neutral Modes */
         public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
@@ -158,7 +169,7 @@ public final class Constants {
     }
 
     public static final HolonomicPathFollowerConfig autoConstants = new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-        new PIDConstants(5.0, .05, 0.0), // Translation PID constants
+        new PIDConstants(2.5, 0, 0.05), // Translation PID constants
         new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
         Swerve.autonomousMaxSpeedSelection, // Max module speed, in m/s
         Math.sqrt(Math.pow(Swerve.wheelBase / 2, 2) + Math.pow(Swerve.trackWidth / 2, 2)), // Drive base radius in meters. Distance from robot center to furthest module.
