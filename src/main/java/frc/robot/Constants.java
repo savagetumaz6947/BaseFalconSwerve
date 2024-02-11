@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -175,4 +176,6 @@ public final class Constants {
         Math.sqrt(Math.pow(Swerve.wheelBase / 2, 2) + Math.pow(Swerve.trackWidth / 2, 2)), // Drive base radius in meters. Distance from robot center to furthest module.
         new ReplanningConfig() // Default path replanning config. See the API for the options here
     );
+
+    public static final PathConstraints defaultPathConstraints = new PathConstraints(3, 5, 1, 2);
 }

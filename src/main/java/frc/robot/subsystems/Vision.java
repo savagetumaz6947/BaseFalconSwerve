@@ -25,7 +25,7 @@ public class Vision {
     public Vision(String cameraName) {
         this(cameraName, new Transform3d(0, 0, 0, new Rotation3d(0, 0, 0)));
     }
-    
+
     /**
      * Constructs a Vision object with the predefined field layout
      * @param cameraName The name of the PhotonCamera

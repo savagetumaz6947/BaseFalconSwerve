@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import org.littletonrobotics.junction.Logger;
+import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -21,9 +21,8 @@ public class Climber extends SubsystemBase {
         rightConfig.apply(motorConfigs);
     }
 
-    public void move (double left, double right) {
-        leftMotor.set(left);
-        rightMotor.set(right);
-        Logger.recordOutput("Hang/leftMotor", left);
+    public void move (DoubleSupplier left, DoubleSupplier right) {
+        leftMotor.set(left.getAsDouble());
+        rightMotor.set(right.getAsDouble());
     }
 }

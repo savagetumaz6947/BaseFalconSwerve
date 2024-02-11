@@ -19,11 +19,15 @@ public class MidIntake extends SubsystemBase {
         motor.setIdleMode(IdleMode.kBrake);
     }
 
-    public void moveMid(double speed) {
+    public void rawMove(double speed) {
         motor.set(speed);
     }
 
-    public Color getColor() {
+    public boolean hasNote() {
+        return getColor().red > 0.32;
+    }
+
+    private Color getColor() {
         return sensor.getColor();
     }
 

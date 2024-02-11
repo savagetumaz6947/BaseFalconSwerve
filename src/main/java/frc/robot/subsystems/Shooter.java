@@ -21,8 +21,8 @@ public class Shooter extends SubsystemBase {
         this.swerve = swerve;
     }
 
-    public void shoot() {
-        up.set(-1);
+    public Command shootRepeatedly() {
+        return this.runEnd(() -> up.set(-1), () -> up.set(0));
     }
 
     public Command idle() {
@@ -32,11 +32,17 @@ public class Shooter extends SubsystemBase {
             } else {
                 up.set(0);
             }
-        }, this);
+        }, this).repeatedly().finallyDo(() -> {
+            up.set(0);
+        });
     }
 
-    public void revIdle() {
-        up.set(0.3);
+    public Command revIdle() {
+        return this.runEnd(() -> up.set(0.3), () -> up.set(0));
+    }
+
+    public void stop() {
+        up.set(0);
     }
 
     public boolean rpmOk() {

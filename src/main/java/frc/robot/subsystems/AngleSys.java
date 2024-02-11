@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MusicTone;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -21,13 +22,9 @@ public class AngleSys extends SubsystemBase {
     private CANSparkMax sparkMaxEncoderOnly = new CANSparkMax(43, MotorType.kBrushed);
     private DigitalInput downLimit = new DigitalInput(9);
     private DigitalInput upLimit = new DigitalInput(8);
-    // private TalonSRX srxEncoderOnly = new TalonSRX(43);
     private RelativeEncoder encoder;
 
     public AngleSys() {
-        // rightMotor.setControl(new StrictFollower(leftMotor.getDeviceID()));
-
-        // rightMotor.setInverted(true);
         encoder = sparkMaxEncoderOnly.getEncoder(SparkRelativeEncoder.Type.kQuadrature, 4096);
 
         var leftConfig = leftMotor.getConfigurator();
@@ -36,6 +33,8 @@ public class AngleSys extends SubsystemBase {
         motorConfigs.NeutralMode = NeutralModeValue.Brake;
         leftConfig.apply(motorConfigs);
         rightConfig.apply(motorConfigs);
+
+        rightMotor.setControl(new Follower(leftMotor.getDeviceID(), true));
 
         encoder.setPosition(0);
     }
@@ -59,24 +58,11 @@ public class AngleSys extends SubsystemBase {
     public void move(double val) {
         if ((downLimit.get() && val < 0) || (upLimit.get() && val > 0)) {
             final DutyCycleOut lRequest = new DutyCycleOut(-val * 0.5);
-            final DutyCycleOut rRequest = new DutyCycleOut(val * 0.5);
             leftMotor.setControl(lRequest);
-            rightMotor.setControl(rRequest);
         } else {
             final DutyCycleOut stopRequest = new DutyCycleOut(0);
             leftMotor.setControl(stopRequest);
-            rightMotor.setControl(stopRequest);
         }
-        // if ((downLimit.get() && val < 0) || (upLimit.get() && val > 0)) {
-        //     final DutyCycleOut stopRequest = new DutyCycleOut(0);
-        //     leftMotor.setControl(stopRequest);
-        //     rightMotor.setControl(stopRequest);
-        // } else {
-        //     final DutyCycleOut lRequest = new DutyCycleOut(-val * 0.5);
-        //     final DutyCycleOut rRequest = new DutyCycleOut(val * 0.5);
-        //     leftMotor.setControl(lRequest);
-        //     rightMotor.setControl(rRequest);
-        // }
     }
 
     public void reset() {

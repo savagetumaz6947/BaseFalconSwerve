@@ -1,8 +1,9 @@
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -14,10 +15,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.drivetrain.Swerve;
 import frc.lib.util.DeadzoneJoystick;
 import frc.robot.commands.TeleopSwerve;
@@ -42,35 +43,38 @@ public class RobotContainer {
     private final DeadzoneJoystick operator = new DeadzoneJoystick(1);
 
     /* Drive Controls */
-    private final int translationAxis = XboxController.Axis.kLeftY.value;
-    private final int strafeAxis = XboxController.Axis.kLeftX.value;
-    private final int rotationAxis = XboxController.Axis.kRightX.value;
+    private final DoubleSupplier translationAxis = () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value);
+    private final DoubleSupplier strafeAxis = () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value);
+    private final DoubleSupplier rotationAxis = () -> -driver.getRawAxis(XboxController.Axis.kRightX.value);
 
     /* Driver Buttons */
-    private final Trigger autoPickupButton = new Trigger(() -> {
-        return driver.getRawAxis(XboxController.Axis.kRightTrigger.value) > 0.8;
-    });
-    private final JoystickButton autoDriveToAmpPos = new JoystickButton(driver, XboxController.Button.kX.value);
+    private final Trigger autoPickupButton = new Trigger(() -> driver.getRawAxis(XboxController.Axis.kRightTrigger.value) > 0.8);
     private final JoystickButton autoShootButton = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
-    private final JoystickButton driverCancelSwerve = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
-    private final JoystickButton zeroSwerveButton = new JoystickButton(driver, XboxController.Button.kStart.value);
+    private final JoystickButton autoDriveToAmpPosBtn = new JoystickButton(driver, XboxController.Button.kX.value);
+    private final JoystickButton autoDriveToMidPosBtn = new JoystickButton(driver, XboxController.Button.kA.value);
+    private final JoystickButton autoDriveToStagePosBtn = new JoystickButton(driver, XboxController.Button.kB.value);
+    private final JoystickButton autoDriveToSourceBtn = new JoystickButton(driver, XboxController.Button.kY.value);
+    private final JoystickButton driverCancelSwerveBtn = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+    private final JoystickButton fodButton = new JoystickButton(driver, XboxController.Button.kStart.value);
 
     /* Operator Controls */
-    private final int leftHangAxis = XboxController.Axis.kLeftY.value;
-    private final int rightHangAxis = XboxController.Axis.kRightY.value;
+    private final DoubleSupplier leftClimbAxis = () -> operator.getRawAxis(XboxController.Axis.kLeftY.value);
+    private final DoubleSupplier rightClimbAxis = () -> operator.getRawAxis(XboxController.Axis.kRightY.value);
+    private final DoubleSupplier bottomIntakeAxis = () -> -operator.getRawAxis(XboxController.Axis.kLeftTrigger.value) + operator.getRawAxis(XboxController.Axis.kRightTrigger.value);
 
     /* Operator Buttons */
-    private final Trigger manualAngleUp = new Trigger(() -> (operator.getPOV() == 0));
-    private final Trigger manualAngleDown = new Trigger(() -> (operator.getPOV() == 180));
-    private final JoystickButton resetAngle = new JoystickButton(operator, XboxController.Button.kStart.value);
-    private final JoystickButton driveToTrap = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
-    private final JoystickButton startShooterButton = new JoystickButton(operator, XboxController.Button.kA.value);
-    private final JoystickButton stopShooterButton = new JoystickButton(operator, XboxController.Button.kB.value);
-    private final JoystickButton startPickupButton = new JoystickButton(operator, XboxController.Button.kY.value);
-    private final JoystickButton stopPickupButton = new JoystickButton(operator, XboxController.Button.kX.value);
-    private final JoystickButton operatorCancelSwerve = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
+    private final Trigger manualAngleUpBtn = new Trigger(() -> (operator.getPOV() == 0));
+    private final Trigger manualAngleDownBtn = new Trigger(() -> (operator.getPOV() == 180));
+    private final Trigger manualMidIntakeUpBtn = new Trigger(() -> (operator.getPOV() == 90));
+    private final Trigger manualMidIntakeDownBtn = new Trigger(() -> (operator.getPOV() == 270));
+    private final JoystickButton resetAngleBtn = new JoystickButton(operator, XboxController.Button.kStart.value);
+    private final JoystickButton compositeKillBtn = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
+    private final JoystickButton manualPickupBtn = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
+    private final JoystickButton trap1Btn = new JoystickButton(operator, XboxController.Button.kX.value);
+    private final JoystickButton trap2Btn = new JoystickButton(operator, XboxController.Button.kY.value);
+    private final JoystickButton trap3Btn = new JoystickButton(operator, XboxController.Button.kB.value);
+    private final JoystickButton manualStartShooterBtn = new JoystickButton(operator, XboxController.Button.kA.value);
 
-    private boolean robotCentric = true;
     private int maxSpeedMode = 1;
 
     /* Subsystems */
@@ -82,92 +86,60 @@ public class RobotContainer {
     private final Climber climber = new Climber();
 
     private final RiseToAngle riseToTrapAngle = new RiseToAngle(() -> 50, angle);
-    private final RiseToAngle riseToAmpPosAngle = new RiseToAngle(() -> 36.734, angle);
 
-    private final Vision intakeCam = new Vision("IntakeCam");
-
+    /* Command Definitions */
     private final Command autoAimToShootCommand = new AutoAimToShoot(s_Swerve);
+    private final AutoRiseToAngle autoRiseToAngleCommand = new AutoRiseToAngle(angle, s_Swerve);
 
-    public final Command pickUpNoteCommand = new InstantCommand(() -> {
-            midIntake.moveMid(-.7);
-            bottomIntake.moveDown(0.5);
-        }, midIntake, bottomIntake).repeatedly().until(() -> midIntake.getColor().red >= 0.32).finallyDo(() -> {
-            bottomIntake.moveDown(0);
-            midIntake.moveMid(0);
+    private final Command pickUpNoteCommand = new InstantCommand(() -> {
+            midIntake.rawMove(-.7);
+            bottomIntake.rawMove(0.5);
+        }, midIntake, bottomIntake).repeatedly().until(() -> midIntake.hasNote()).finallyDo(() -> {
+            bottomIntake.rawMove(0);
+            midIntake.rawMove(0);
         });
-    public final Command autoGrabNoteCommand = new SequentialCommandGroup(
-            new AutoAimNote(s_Swerve, intakeCam),
+    private final Command autoGrabNoteCommand = new SequentialCommandGroup(
+            new AutoAimNote(s_Swerve, bottomIntake.getCamera()),
             new ParallelDeadlineGroup(
                 pickUpNoteCommand,
-                new InstantCommand(() -> 
-                    s_Swerve.driveChassis(new ChassisSpeeds(1.5, 0, 0))
-                , s_Swerve).repeatedly()),
-            new InstantCommand(() -> s_Swerve.driveChassis(new ChassisSpeeds(0, 0, 0)), s_Swerve)
-        );
-    public final AutoRiseToAngle autoRiseToAngleCommand = new AutoRiseToAngle(angle, s_Swerve);
-    public final Command dropIntake = new InstantCommand(() -> {
-        midIntake.moveMid(-1);
-        angle.move(0);
-        bottomIntake.moveDown(0);
-        shooter.revIdle();
-    }, bottomIntake, midIntake, angle, shooter).repeatedly().withTimeout(0.3).andThen(
-        new SequentialCommandGroup(
-            new InstantCommand(() -> midIntake.moveMid(1), midIntake).repeatedly().withTimeout(0.3),
-            new ParallelDeadlineGroup(
-                new SequentialCommandGroup(
-                    new InstantCommand(() -> midIntake.moveMid(0), midIntake),
-                    new InstantCommand(() -> System.out.println("waiting for shooter...")).repeatedly().until(() -> shooter.rpmOk()).withTimeout(3),
-                    new InstantCommand(() -> midIntake.moveMid(-1), midIntake).repeatedly().withTimeout(1)
-                ),
-                new InstantCommand(() -> shooter.shoot(), shooter).repeatedly()
-            ).andThen(shooter.idle())
-        )
-    );
-    public final Command shootCommand = new ParallelDeadlineGroup(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    System.out.println("waiting for finish (autoRise: " + autoRiseToAngleCommand.isFinished() + ")");
-                }).repeatedly().until(() -> autoRiseToAngleCommand.isFinished()).withTimeout(2),
-                new InstantCommand(() -> {
-                    System.out.println("waiting for rpm (rpm: " + shooter.rpmOk() + ")");
-                }).repeatedly().until(() -> shooter.rpmOk()).withTimeout(2),
-                new InstantCommand(() -> {
-                    System.out.println("waiting for aimtoshoot (aimtoshoot: " + autoAimToShootCommand.isFinished() + ")");
-                }).repeatedly().until(() -> autoAimToShootCommand.isFinished()).withTimeout(2),
-                new InstantCommand(() -> midIntake.moveMid(-1), midIntake).repeatedly().withTimeout(1)
+                s_Swerve.run(() -> s_Swerve.driveChassis(new ChassisSpeeds(1.5, 0, 0)))
             ),
-            autoAimToShootCommand,
-            new InstantCommand(() -> shooter.shoot(), shooter).repeatedly()
+            s_Swerve.runOnce(() -> s_Swerve.driveChassis(new ChassisSpeeds(0, 0, 0)))
+        );
+    private final Command autoShootCommand = new ParallelDeadlineGroup(
+            new SequentialCommandGroup(
+                new WaitUntilCommand(() -> autoRiseToAngleCommand.isFinished()).withTimeout(2),
+                new WaitUntilCommand(() -> shooter.rpmOk()).withTimeout(2),
+                new WaitUntilCommand(() -> autoAimToShootCommand.isFinished()).withTimeout(2),
+                midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
+            ),
+            autoAimToShootCommand.repeatedly(),
+            shooter.shootRepeatedly()
         ).finallyDo(() -> shooter.idle());
 
     private final SendableChooser<Command> autoChooser;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
+        // Set default commands
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
-                s_Swerve, 
-                () -> -driver.getRawAxis(translationAxis), 
-                () -> -driver.getRawAxis(strafeAxis), 
-                () -> -driver.getRawAxis(rotationAxis), 
-                () -> robotCentric,
+                s_Swerve,
+                translationAxis,
+                strafeAxis,
+                rotationAxis,
+                () -> !fodButton.getAsBoolean(),
                 () -> maxSpeedMode
             )
         );
-
-        midIntake.setDefaultCommand(new InstantCommand(() -> midIntake.moveMid(driver.getPOV() == 270 ? 1 : (driver.getPOV() == 90 ? -1 : 0)), midIntake));
-        // bottomIntake.setDefaultCommand(new InstantCommand(() -> bottomIntake.moveDown(driver.getRawAxis(intakeBAxis)), bottomIntake));
-        // angle.setDefaultCommand(new InstantCommand(() -> angle.move(driver.getPOV() == 0 ? 0.5 : (driver.getPOV() == 180 ? -0.5 : 0)), angle));
         shooter.setDefaultCommand(shooter.idle());
         angle.setDefaultCommand(autoRiseToAngleCommand.repeatedly());
-        // angle.setDefaultCommand(new AutoRiseToAngle(angle, s_Swerve));
-        climber.setDefaultCommand(new InstantCommand(() -> climber.move(operator.getRawAxis(leftHangAxis), operator.getRawAxis(rightHangAxis)), climber));
+        climber.setDefaultCommand(climber.run(() -> climber.move(leftClimbAxis, rightClimbAxis)));
+        bottomIntake.setDefaultCommand(bottomIntake.run(() -> bottomIntake.rawMove(bottomIntakeAxis.getAsDouble())));
 
         // Register named commands
         NamedCommands.registerCommand("PickUpNote", pickUpNoteCommand);
-        NamedCommands.registerCommand("Shoot", shootCommand);
-        NamedCommands.registerCommand("RiseToAngleAtAmpPos", riseToAmpPosAngle.repeatedly());
-        // NamedCommands.registerCommand("ShooterReady", new InstantCommand(() -> shooter.shoot(), shooter).repeatedly());
+        NamedCommands.registerCommand("Shoot", autoShootCommand);
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -184,49 +156,33 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
-        startShooterButton.onTrue(new InstantCommand(() -> shooter.shoot(), shooter));
-        stopShooterButton.onTrue(new InstantCommand(() -> shooter.idle(), shooter));
-        startPickupButton.onTrue(new InstantCommand(() -> {
-            midIntake.moveMid(-.7);
-            bottomIntake.moveDown(0.4);
-        }, midIntake, bottomIntake).repeatedly().until(() -> midIntake.getColor().red >= 0.32).finallyDo(() -> {
-            bottomIntake.moveDown(0);
-            midIntake.moveMid(0);
-        }));
-        stopPickupButton.onTrue(new InstantCommand(() -> {
-            midIntake.moveMid(0);
-            bottomIntake.moveDown(0);
-        }, midIntake, bottomIntake));
-        autoShootButton.onTrue(shootCommand);
-        autoDriveToAmpPos.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToAmpShootSpot"), new PathConstraints(2.5, 5, 360, 720)));
-        // kLeftBumper.onTrue(dropIntake);
-        operatorCancelSwerve.onTrue(new InstantCommand(() -> {}, s_Swerve));
-        driverCancelSwerve.onTrue(new InstantCommand(() -> {}, s_Swerve));
-        zeroSwerveButton.whileTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
+        driverCancelSwerveBtn.onTrue(s_Swerve.runOnce(() -> s_Swerve.driveChassis(new ChassisSpeeds())));
         autoPickupButton.onTrue(autoGrabNoteCommand);
+        autoShootButton.onTrue(autoShootCommand);
+        autoDriveToAmpPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToAmpShootSpot"), Constants.defaultPathConstraints));
+        autoDriveToMidPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToMidShootSpot"), Constants.defaultPathConstraints));
+        autoDriveToStagePosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToStageShootSpot"), Constants.defaultPathConstraints));
+        autoDriveToSourceBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToSource"), Constants.defaultPathConstraints));
 
-        manualAngleUp.whileTrue(new InstantCommand(() -> angle.move(0.5), angle).repeatedly());
-        manualAngleDown.whileTrue(new InstantCommand(() -> angle.move(-0.5), angle).repeatedly());
-        resetAngle.onTrue(new InstantCommand(() -> angle.reset()));
-
-        driveToTrap.onTrue(
-            // riseToTrapAngle.repeatedly()
-            new ParallelDeadlineGroup(
-                new SequentialCommandGroup(
-                    // AutoBuilder.pathfindToPose(new Pose2d(4.17, 5.303, new Rotation2d(2.041)), new PathConstraints(1.5, 5, 360, 720)),
-                    AutoBuilder.pathfindThenFollowPath(
-                        PathPlannerPath.fromPathFile("ToTrap1"), new PathConstraints(1.5, 5, 360, 720)),
-                    new InstantCommand(() -> {
-                        System.out.println("Waiting for angle... (" + riseToTrapAngle.isFinished() + ")");
-                    }).repeatedly().until(() -> riseToTrapAngle.isFinished()),
-                    new InstantCommand(() -> midIntake.moveMid(-1), midIntake).repeatedly().withTimeout(1)
-                ),
-                riseToTrapAngle.repeatedly(),
-                new InstantCommand(() -> shooter.shoot(), shooter).repeatedly()
-            ).finallyDo(() -> midIntake.moveMid(0))
-
-        );
-
+        /* Operator Buttons */
+        manualAngleUpBtn.whileTrue(new InstantCommand(() -> angle.move(0.5), angle).repeatedly());
+        manualAngleDownBtn.whileTrue(new InstantCommand(() -> angle.move(-0.5), angle).repeatedly());
+        manualMidIntakeUpBtn.whileTrue(new InstantCommand(() -> midIntake.rawMove(-0.7), midIntake).repeatedly());
+        manualMidIntakeDownBtn.whileTrue(new InstantCommand(() -> midIntake.rawMove(0.7), midIntake).repeatedly());
+        resetAngleBtn.onTrue(new InstantCommand(() -> angle.reset()));
+        compositeKillBtn.whileTrue(new InstantCommand(() -> {
+            s_Swerve.driveChassis(new ChassisSpeeds());
+            midIntake.rawMove(0);
+            bottomIntake.rawMove(0);
+            shooter.stop();
+            angle.move(0);
+            climber.move(() -> 0, () -> 0);
+        }, s_Swerve, midIntake, bottomIntake, shooter, angle, climber));
+        manualPickupBtn.onTrue(pickUpNoteCommand);
+        trap1Btn.onTrue(s_Swerve.getTrapCommand(1, riseToTrapAngle, shooter, midIntake));
+        trap2Btn.onTrue(s_Swerve.getTrapCommand(2, riseToTrapAngle, shooter, midIntake));
+        trap3Btn.onTrue(s_Swerve.getTrapCommand(3, riseToTrapAngle, shooter, midIntake));
+        manualStartShooterBtn.onTrue(shooter.run(() -> shooter.shootRepeatedly()));
     }
 
     /**
