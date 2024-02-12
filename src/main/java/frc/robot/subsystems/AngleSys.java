@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MusicTone;
@@ -14,6 +15,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class AngleSys extends SubsystemBase {
@@ -27,9 +29,9 @@ public class AngleSys extends SubsystemBase {
     public AngleSys() {
         encoder = sparkMaxEncoderOnly.getEncoder(SparkRelativeEncoder.Type.kQuadrature, 4096);
 
-        var leftConfig = leftMotor.getConfigurator();
-        var rightConfig = rightMotor.getConfigurator();
-        var motorConfigs = new MotorOutputConfigs();
+        TalonFXConfigurator leftConfig = leftMotor.getConfigurator();
+        TalonFXConfigurator rightConfig = rightMotor.getConfigurator();
+        MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
         motorConfigs.NeutralMode = NeutralModeValue.Brake;
         leftConfig.apply(motorConfigs);
         rightConfig.apply(motorConfigs);
@@ -76,5 +78,8 @@ public class AngleSys extends SubsystemBase {
         Logger.recordOutput("AngleSys/EncoderAngleDeg", getAngle());
         Logger.recordOutput("AngleSys/DownLimit", downLimit.get());
         Logger.recordOutput("AngleSys/UpLimit", upLimit.get());
+
+        SmartDashboard.putNumber("AngleSys/EncoderPos", encoder.getPosition());
+        SmartDashboard.putNumber("AngleSys/EncoderAngleDeg", getAngle());
     }
 }
