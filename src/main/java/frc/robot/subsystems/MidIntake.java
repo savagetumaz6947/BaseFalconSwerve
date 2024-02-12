@@ -34,5 +34,6 @@ public class MidIntake extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putString("Color", getColor().toString());
+        SmartDashboard.putBoolean("HasNote", hasNote());
     }
 }

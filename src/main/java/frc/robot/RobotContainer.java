@@ -29,6 +29,7 @@ import frc.robot.commands.Shooting.AutoAimToShoot;
 import frc.robot.subsystems.AngleSys;
 import frc.robot.subsystems.BottomIntake;
 import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.LedStrip;
 import frc.robot.subsystems.MidIntake;
 
 /**
@@ -78,6 +79,7 @@ public class RobotContainer {
     private int maxSpeedMode = 1;
 
     /* Subsystems */
+    private final LedStrip ledStrip = new LedStrip();
     private final Swerve s_Swerve = new Swerve();
     private final MidIntake midIntake = new MidIntake();
     private final BottomIntake bottomIntake = new BottomIntake();
@@ -111,11 +113,15 @@ public class RobotContainer {
                 new WaitUntilCommand(() -> autoRiseToAngleCommand.isFinished()).withTimeout(2),
                 new WaitUntilCommand(() -> shooter.rpmOk()).withTimeout(2),
                 new WaitUntilCommand(() -> autoAimToShootCommand.isFinished()).withTimeout(2),
+                new InstantCommand(() -> ledStrip.shooterReady(true)),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
             autoAimToShootCommand.repeatedly(),
             shooter.shootRepeatedly()
-        ).finallyDo(() -> shooter.idle());
+        ).finallyDo(() -> {
+            shooter.idle();
+            ledStrip.shooterReady(false);
+        });
 
     private final SendableChooser<Command> autoChooser;
 
