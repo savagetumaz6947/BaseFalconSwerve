@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,6 +21,11 @@ public class TeleopSwerve extends Command {
     private DoubleSupplier rotationSup;
     private BooleanSupplier robotCentricSup;
     private IntSupplier maxSpeedMode;
+
+    private SlewRateLimiter translateXLimiter = new SlewRateLimiter(Constants.Swerve.teleopMaxTranslateAcceleration);
+    private SlewRateLimiter translateYLimiter = new SlewRateLimiter(Constants.Swerve.teleopMaxTranslateAcceleration);
+
+    private SlewRateLimiter angularLimiter = new SlewRateLimiter(Constants.Swerve.teleopMaxAngularAcceleration);
 
     public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup, IntSupplier maxSpeedMode) {
         this.s_Swerve = s_Swerve;
@@ -41,12 +47,15 @@ public class TeleopSwerve extends Command {
         double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
         double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
 
-        SmartDashboard.putNumber("maxSpeedMode", maxSpeedMode.getAsInt());
+        SmartDashboard.putNumber("Max Speed", Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]);
 
         /* Drive */
         s_Swerve.drive(
-            new Translation2d(translationVal * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()], strafeVal * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]), 
-            rotationVal * Constants.Swerve.maxAngularVelocity, 
+            new Translation2d(
+                translateXLimiter.calculate(translationVal * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]),
+                translateYLimiter.calculate(strafeVal * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()])
+            ), 
+            angularLimiter.calculate(rotationVal * Constants.Swerve.maxAngularVelocity),
             robotCentricSup.getAsBoolean(), 
             Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]
         );

@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
@@ -117,8 +118,12 @@ public final class Constants {
                                                         //   You can ignore this value if "isOpenLoop" is set to FALSE
         public static final double[] speedSelection = {1.3, 2.5, 4.5}; //TODO: You can set this to your desired speed
         public static final double autonomousMaxSpeedSelection  = 4.5; // This refers to the index of the speedSelection defined on top by speedSelection[] used by Autonomous mode
+
+        public static final double teleopMaxTranslateAcceleration = 4;
         /** Radians per Second */
-        public static final double maxAngularVelocity = 6; //TODO: This must be tuned to specific robot
+        public static final double maxAngularVelocity = Units.degreesToRadians(360); //TODO: This must be tuned to specific robot
+
+        public static final double teleopMaxAngularAcceleration = Units.degreesToRadians(420);
 
         /* Neutral Modes */
         public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;

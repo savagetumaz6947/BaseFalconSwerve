@@ -57,6 +57,8 @@ public class RobotContainer {
     private final JoystickButton autoDriveToSourceBtn = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton driverCancelSwerveBtn = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     private final JoystickButton fodButton = new JoystickButton(driver, XboxController.Button.kStart.value);
+    private final Trigger maxSpeedUp = new Trigger(() -> driver.getPOV() == 0);
+    private final Trigger maxSpeedDown = new Trigger(() -> driver.getPOV() == 180);
 
     /* Operator Controls */
     private final DoubleSupplier leftClimbAxis = () -> operator.getRawAxis(XboxController.Axis.kLeftY.value);
@@ -169,12 +171,18 @@ public class RobotContainer {
         autoDriveToMidPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToMidShootSpot"), Constants.defaultPathConstraints));
         autoDriveToStagePosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToStageShootSpot"), Constants.defaultPathConstraints));
         autoDriveToSourceBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToSource"), Constants.defaultPathConstraints));
+        maxSpeedUp.onTrue(new InstantCommand(() ->
+            maxSpeedMode = maxSpeedMode + 1 < Constants.Swerve.speedSelection.length ? maxSpeedMode + 1 : maxSpeedMode
+        ));
+        maxSpeedDown.onTrue(new InstantCommand(() ->
+            maxSpeedMode = maxSpeedMode - 1 >= 0 ? maxSpeedMode - 1 : maxSpeedMode
+        ));
 
         /* Operator Buttons */
-        manualAngleUpBtn.whileTrue(new InstantCommand(() -> angle.move(0.5), angle).repeatedly());
-        manualAngleDownBtn.whileTrue(new InstantCommand(() -> angle.move(-0.5), angle).repeatedly());
-        manualMidIntakeUpBtn.whileTrue(new InstantCommand(() -> midIntake.rawMove(-0.7), midIntake).repeatedly());
-        manualMidIntakeDownBtn.whileTrue(new InstantCommand(() -> midIntake.rawMove(0.7), midIntake).repeatedly());
+        manualAngleUpBtn.whileTrue(angle.run(() -> angle.move(0.5)));
+        manualAngleDownBtn.whileTrue(angle.run(() -> angle.move(-0.5)));
+        manualMidIntakeUpBtn.whileTrue(midIntake.run(() -> midIntake.rawMove(-0.7)));
+        manualMidIntakeDownBtn.whileTrue(midIntake.run(() -> midIntake.rawMove(0.7)));
         resetAngleBtn.onTrue(new InstantCommand(() -> angle.reset()));
         compositeKillBtn.whileTrue(new InstantCommand(() -> {
             s_Swerve.driveChassis(new ChassisSpeeds());
