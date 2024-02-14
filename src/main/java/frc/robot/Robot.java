@@ -44,6 +44,11 @@ public class Robot extends LoggedRobot {
     Logger.recordMetadata("Project Name", "Savage Tumaz by Aaron"); // Set a metadata value
 
     if (isReal()) {
+      try {
+        Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick (FAT32 formatted, "/U/logs")
+      } catch (Exception e) {
+        System.out.println("Exception " + e + " when opening WPILOGWriter. Did you insert a FAT32 formatted USB Stick?");
+      }
       Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
       pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
     } else {
