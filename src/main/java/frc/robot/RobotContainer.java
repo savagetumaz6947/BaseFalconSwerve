@@ -4,6 +4,7 @@ import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -89,7 +90,9 @@ public class RobotContainer {
     private final AngleSys angle = new AngleSys();
     private final Climber climber = new Climber();
 
-    private final RiseToAngle riseToTrapAngle = new RiseToAngle(() -> 50, angle);
+    private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 50, angle);
+    private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 50, angle);
+    private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 50, angle);
 
     /* Command Definitions */
     private final Command autoAimToShootCommand = new AutoAimToShoot(s_Swerve);
@@ -105,7 +108,15 @@ public class RobotContainer {
     private final Command autoGrabNoteCommand = new SequentialCommandGroup(
             new AutoAimNote(s_Swerve, bottomIntake.getCamera()),
             new ParallelDeadlineGroup(
-                pickUpNoteCommand,
+                /* PICK UP NOTE COMMAND */
+                new InstantCommand(() -> {
+                    midIntake.rawMove(-.7);
+                    bottomIntake.rawMove(0.5);
+                }, midIntake, bottomIntake).repeatedly().until(() -> midIntake.hasNote()).finallyDo(() -> {
+                    bottomIntake.rawMove(0);
+                    midIntake.rawMove(0);
+                })
+                /* PICK UP NOTE COMMAND END */,
                 s_Swerve.run(() -> s_Swerve.driveChassis(new ChassisSpeeds(1.5, 0, 0)))
             ),
             s_Swerve.runOnce(() -> s_Swerve.driveChassis(new ChassisSpeeds(0, 0, 0)))
@@ -122,6 +133,7 @@ public class RobotContainer {
             shooter.shootRepeatedly()
         ).finallyDo(() -> {
             shooter.idle();
+            midIntake.rawMove(0);
             ledStrip.shooterReady(false);
         });
 
@@ -143,7 +155,7 @@ public class RobotContainer {
         shooter.setDefaultCommand(shooter.idle());
         angle.setDefaultCommand(autoRiseToAngleCommand.repeatedly());
         climber.setDefaultCommand(climber.run(() -> climber.move(leftClimbAxis, rightClimbAxis)));
-        bottomIntake.setDefaultCommand(bottomIntake.run(() -> bottomIntake.rawMove(bottomIntakeAxis.getAsDouble())));
+        bottomIntake.setDefaultCommand(bottomIntake.run(() -> bottomIntake.rawMove(bottomIntakeAxis.getAsDouble() * 0.5)));
 
         // Register named commands
         NamedCommands.registerCommand("PickUpNote", pickUpNoteCommand);
@@ -179,10 +191,10 @@ public class RobotContainer {
         ));
 
         /* Operator Buttons */
-        manualAngleUpBtn.whileTrue(angle.run(() -> angle.move(0.5)));
-        manualAngleDownBtn.whileTrue(angle.run(() -> angle.move(-0.5)));
-        manualMidIntakeUpBtn.whileTrue(midIntake.run(() -> midIntake.rawMove(-0.7)));
-        manualMidIntakeDownBtn.whileTrue(midIntake.run(() -> midIntake.rawMove(0.7)));
+        manualAngleUpBtn.whileTrue(angle.run(() -> angle.move(0.5)).repeatedly().finallyDo(() -> angle.move(0)));
+        manualAngleDownBtn.whileTrue(angle.run(() -> angle.move(-0.5)).repeatedly().finallyDo(() -> angle.move(0)));
+        manualMidIntakeUpBtn.whileTrue(midIntake.run(() -> midIntake.rawMove(-0.7)).repeatedly().finallyDo(() -> midIntake.rawMove(0)));
+        manualMidIntakeDownBtn.whileTrue(midIntake.run(() -> midIntake.rawMove(0.7)).repeatedly().finallyDo(() -> midIntake.rawMove(0)));
         resetAngleBtn.onTrue(new InstantCommand(() -> angle.reset()));
         compositeKillBtn.whileTrue(new InstantCommand(() -> {
             s_Swerve.driveChassis(new ChassisSpeeds());
@@ -193,10 +205,37 @@ public class RobotContainer {
             climber.move(() -> 0, () -> 0);
         }, s_Swerve, midIntake, bottomIntake, shooter, angle, climber));
         manualPickupBtn.onTrue(pickUpNoteCommand);
-        trap1Btn.onTrue(s_Swerve.getTrapCommand(1, riseToTrapAngle, shooter, midIntake));
-        trap2Btn.onTrue(s_Swerve.getTrapCommand(2, riseToTrapAngle, shooter, midIntake));
-        trap3Btn.onTrue(s_Swerve.getTrapCommand(3, riseToTrapAngle, shooter, midIntake));
-        manualStartShooterBtn.onTrue(shooter.run(() -> shooter.shootRepeatedly()));
+        trap1Btn.onTrue(new ParallelDeadlineGroup(
+            new SequentialCommandGroup(
+                AutoBuilder.pathfindThenFollowPath(
+                    PathPlannerPath.fromPathFile("ToTrap1"), new PathConstraints(2.5, 5, Math.toRadians(420), Math.toRadians(720))),
+                new WaitUntilCommand(() -> riseToTrap1Angle.isFinished()).withTimeout(2),
+                midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
+            ),
+            riseToTrap1Angle.repeatedly(),
+            shooter.shootRepeatedly()
+        ).finallyDo(() -> midIntake.rawMove(0)));
+        trap2Btn.onTrue(new ParallelDeadlineGroup(
+            new SequentialCommandGroup(
+                AutoBuilder.pathfindThenFollowPath(
+                    PathPlannerPath.fromPathFile("ToTrap2"), Constants.defaultPathConstraints),
+                new WaitUntilCommand(() -> riseToTrap2Angle.isFinished()).withTimeout(2),
+                midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
+            ),
+            riseToTrap2Angle.repeatedly(),
+            shooter.shootRepeatedly()
+        ).finallyDo(() -> midIntake.rawMove(0)));
+        trap3Btn.onTrue(new ParallelDeadlineGroup(
+            new SequentialCommandGroup(
+                AutoBuilder.pathfindThenFollowPath(
+                    PathPlannerPath.fromPathFile("ToTrap3"), Constants.defaultPathConstraints),
+                new WaitUntilCommand(() -> riseToTrap3Angle.isFinished()).withTimeout(2),
+                midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
+            ),
+            riseToTrap3Angle.repeatedly(),
+            shooter.shootRepeatedly()
+        ).finallyDo(() -> midIntake.rawMove(0)));
+        manualStartShooterBtn.onTrue(shooter.shootRepeatedly());
     }
 
     /**

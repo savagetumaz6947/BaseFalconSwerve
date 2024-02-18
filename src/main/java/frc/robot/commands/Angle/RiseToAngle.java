@@ -11,7 +11,7 @@ import frc.robot.subsystems.AngleSys;
 public class RiseToAngle extends PIDCommand {
     public RiseToAngle(DoubleSupplier targetAngleDegrees, AngleSys angleSys) {
         super(
-            new PIDController(0.04, 0.02, 0),
+            new PIDController(0.045, 0.02, 0),
             angleSys::getAngle,
             targetAngleDegrees,
             angleSys::move,

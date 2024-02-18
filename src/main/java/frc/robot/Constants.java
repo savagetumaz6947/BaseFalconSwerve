@@ -119,9 +119,9 @@ public final class Constants {
         public static final double[] speedSelection = {1.3, 2.5, 4.5}; //TODO: You can set this to your desired speed
         public static final double autonomousMaxSpeedSelection  = 4.5; // This refers to the index of the speedSelection defined on top by speedSelection[] used by Autonomous mode
 
-        public static final double teleopMaxTranslateAcceleration = 4;
+        public static final double teleopMaxTranslateAcceleration = 8;
         /** Radians per Second */
-        public static final double maxAngularVelocity = Units.degreesToRadians(360); //TODO: This must be tuned to specific robot
+        public static final double maxAngularVelocity = Units.degreesToRadians(420); //TODO: This must be tuned to specific robot
 
         public static final double teleopMaxAngularAcceleration = Units.degreesToRadians(420);
 
@@ -182,5 +182,5 @@ public final class Constants {
         new ReplanningConfig() // Default path replanning config. See the API for the options here
     );
 
-    public static final PathConstraints defaultPathConstraints = new PathConstraints(3, 5, 1, 2);
+    public static final PathConstraints defaultPathConstraints = new PathConstraints(3.3, 5, Math.toRadians(420), Math.toRadians(720));
 }

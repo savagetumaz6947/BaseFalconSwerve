@@ -161,7 +161,7 @@ public class Swerve extends SubsystemBase {
      */
     public double getDistToSpeaker() {
         Pose2d pose = getPose();
-        if (DriverStation.getAlliance().get() == Alliance.Blue)
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
             return Math.sqrt(Math.pow(pose.getX() - Constants.GameObjects.BlueAlliance.speaker.getX(),2) + 
                                 Math.pow(pose.getY() - Constants.GameObjects.BlueAlliance.speaker.getY(), 2));
         else
@@ -171,7 +171,7 @@ public class Swerve extends SubsystemBase {
 
     public double getAngleToSpeaker() {
         Pose2d pose = getPose();
-        if (DriverStation.getAlliance().get() == Alliance.Blue)
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
             return Math.atan((pose.getY() - Constants.GameObjects.BlueAlliance.speaker.getY()) / 
                                 (pose.getX() - Constants.GameObjects.BlueAlliance.speaker.getX()));
         else

@@ -25,8 +25,6 @@ public class TeleopSwerve extends Command {
     private SlewRateLimiter translateXLimiter = new SlewRateLimiter(Constants.Swerve.teleopMaxTranslateAcceleration);
     private SlewRateLimiter translateYLimiter = new SlewRateLimiter(Constants.Swerve.teleopMaxTranslateAcceleration);
 
-    private SlewRateLimiter angularLimiter = new SlewRateLimiter(Constants.Swerve.teleopMaxAngularAcceleration);
-
     public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup, IntSupplier maxSpeedMode) {
         this.s_Swerve = s_Swerve;
         addRequirements(s_Swerve);
@@ -55,7 +53,7 @@ public class TeleopSwerve extends Command {
                 translateXLimiter.calculate(translationVal * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]),
                 translateYLimiter.calculate(strafeVal * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()])
             ), 
-            angularLimiter.calculate(rotationVal * Constants.Swerve.maxAngularVelocity),
+            rotationVal * Constants.Swerve.maxAngularVelocity,
             robotCentricSup.getAsBoolean(), 
             Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]
         );

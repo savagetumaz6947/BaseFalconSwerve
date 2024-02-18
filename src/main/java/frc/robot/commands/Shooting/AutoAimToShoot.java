@@ -10,11 +10,11 @@ import frc.robot.subsystems.drivetrain.Swerve;
 
 public class AutoAimToShoot extends PIDCommand {
     public AutoAimToShoot(Swerve swerve) {
-        super(new PIDController(0.02, 0.015, 0.005),
+        super(new PIDController(10, 0, 1.0),
             () -> swerve.getPose().getRotation().getDegrees(),
             () -> Math.toDegrees(swerve.getAngleToSpeaker()),
             (double omega_per_second) -> {
-                swerve.driveChassis(new ChassisSpeeds(0, 0, omega_per_second));
+                swerve.driveChassis(new ChassisSpeeds(0, 0, Math.toRadians(omega_per_second)));
             },
             swerve
         );

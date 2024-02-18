@@ -59,7 +59,7 @@ public class AngleSys extends SubsystemBase {
 
     public void move(double val) {
         if ((downLimit.get() && val < 0) || (upLimit.get() && val > 0)) {
-            final DutyCycleOut lRequest = new DutyCycleOut(-val * 0.5);
+            final DutyCycleOut lRequest = new DutyCycleOut(-val * 1);
             leftMotor.setControl(lRequest);
         } else {
             final DutyCycleOut stopRequest = new DutyCycleOut(0);
