@@ -7,7 +7,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -41,19 +40,15 @@ public class TeleopSwerve extends Command {
     @Override
     public void execute() {
         /* Get Values, Deadband*/
-        double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband);
-        double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
-        double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
-
         SmartDashboard.putNumber("Max Speed", Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]);
 
         /* Drive */
         s_Swerve.drive(
             new Translation2d(
-                translateXLimiter.calculate(translationVal * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]),
-                translateYLimiter.calculate(strafeVal * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()])
+                translateXLimiter.calculate(this.translationSup.getAsDouble() * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]),
+                translateYLimiter.calculate(this.strafeSup.getAsDouble() * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()])
             ), 
-            rotationVal * Constants.Swerve.maxAngularVelocity,
+            this.rotationSup.getAsDouble() * Constants.Swerve.maxAngularVelocity,
             robotCentricSup.getAsBoolean(), 
             Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]
         );

@@ -1,6 +1,8 @@
 package frc.lib.util;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
+import frc.robot.Constants;
 
 public class DeadzoneJoystick extends Joystick {
     public DeadzoneJoystick (final int port) {
@@ -9,7 +11,6 @@ public class DeadzoneJoystick extends Joystick {
 
     @Override
     public double getRawAxis(int axis) {
-        double val = super.getRawAxis(axis);
-        return Math.abs(val) > 0.2 ? val : 0;
+        return MathUtil.applyDeadband(super.getRawAxis(axis), Constants.stickDeadband);
     }
 }

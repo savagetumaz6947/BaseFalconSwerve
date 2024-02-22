@@ -121,7 +121,7 @@ public class RobotContainer {
     private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 50, angle);
 
     /* Command Definitions */
-    private final Command autoAimToShootCommand = new AutoAimToShoot(s_Swerve);
+    private final AutoAimToShoot autoAimToShootCommand = new AutoAimToShoot(s_Swerve);
     private final AutoRiseToAngle autoRiseToAngleCommand = new AutoRiseToAngle(angle, s_Swerve);
 
     private final Command pickUpNoteCommand = new InstantCommand(() -> {

@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,9 +26,13 @@ public class Shooter extends SubsystemBase {
         return this.runEnd(() -> up.set(-1), () -> up.set(0));
     }
 
+    public boolean inRange() {
+        return swerve.getAngleToSpeaker() < 3.5;
+    }
+
     public Command idle() {
         return new InstantCommand(() -> {
-            if (swerve.getDistToSpeaker() < 3.5) {
+            if (inRange()) {
                 up.set(-0.2);
             } else {
                 up.set(0);
@@ -53,5 +58,7 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         Logger.recordOutput("Shooter/UP_RPM",  up.getEncoder().getVelocity());
         Logger.recordOutput("Shooter/DOWN_RPM",  up.getEncoder().getVelocity());
+
+        SmartDashboard.putBoolean("Shooter In Range", inRange());
     }
 }
