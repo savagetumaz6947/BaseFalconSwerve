@@ -8,8 +8,10 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,9 +54,21 @@ public class RobotContainer {
     /* Driver Buttons */
     private final Trigger autoPickupButton = new Trigger(() -> driver.getRawAxis(XboxController.Axis.kRightTrigger.value) > 0.8);
     private final JoystickButton autoShootButton = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
-    private final JoystickButton autoDriveToAmpPosBtn = new JoystickButton(driver, XboxController.Button.kX.value);
+    private final Trigger autoDriveToAmpPosBtn = new Trigger(() -> {
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+            return driver.getRawButton(XboxController.Button.kX.value);
+        } else {
+            return driver.getRawButton(XboxController.Button.kB.value);
+        }
+    });
     private final JoystickButton autoDriveToMidPosBtn = new JoystickButton(driver, XboxController.Button.kA.value);
-    private final JoystickButton autoDriveToStagePosBtn = new JoystickButton(driver, XboxController.Button.kB.value);
+    private final Trigger autoDriveToStagePosBtn = new Trigger(() -> {
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+            return driver.getRawButton(XboxController.Button.kB.value);
+        } else {
+            return driver.getRawButton(XboxController.Button.kX.value);
+        }
+    });
     private final JoystickButton autoDriveToSourceBtn = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton driverCancelSwerveBtn = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     private final JoystickButton fodButton = new JoystickButton(driver, XboxController.Button.kStart.value);
@@ -74,9 +88,21 @@ public class RobotContainer {
     private final JoystickButton resetAngleBtn = new JoystickButton(operator, XboxController.Button.kStart.value);
     private final JoystickButton compositeKillBtn = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
     private final JoystickButton manualPickupBtn = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
-    private final JoystickButton trap1Btn = new JoystickButton(operator, XboxController.Button.kX.value);
+    private final Trigger trap1Btn = new Trigger(() -> {
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+            return operator.getRawButton(XboxController.Button.kX.value);
+        } else {
+            return operator.getRawButton(XboxController.Button.kB.value);
+        }
+    });
     private final JoystickButton trap2Btn = new JoystickButton(operator, XboxController.Button.kY.value);
-    private final JoystickButton trap3Btn = new JoystickButton(operator, XboxController.Button.kB.value);
+    private final Trigger trap3Btn = new Trigger(() -> {
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+            return operator.getRawButton(XboxController.Button.kB.value);
+        } else {
+            return operator.getRawButton(XboxController.Button.kX.value);
+        }
+    });
     private final JoystickButton manualStartShooterBtn = new JoystickButton(operator, XboxController.Button.kA.value);
 
     private int maxSpeedMode = 1;
