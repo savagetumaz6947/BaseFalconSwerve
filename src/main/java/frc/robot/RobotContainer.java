@@ -33,7 +33,6 @@ import frc.robot.subsystems.AngleSys;
 import frc.robot.subsystems.BottomIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.IntakeAngle;
-import frc.robot.subsystems.LedStrip;
 import frc.robot.subsystems.MidIntake;
 
 /**
@@ -109,22 +108,21 @@ public class RobotContainer {
     private int maxSpeedMode = 1;
 
     /* Subsystems */
-    private final LedStrip ledStrip = new LedStrip();
-    private final Swerve s_Swerve = new Swerve();
+    private final Swerve swerve = new Swerve();
     private final MidIntake midIntake = new MidIntake();
     private final BottomIntake bottomIntake = new BottomIntake();
-    private final Shooter shooter = new Shooter(s_Swerve);
-    private final AngleSys angle = new AngleSys();
+    private final Shooter shooter = new Shooter(swerve);
+    private final AngleSys angleSys = new AngleSys();
     private final Climber climber = new Climber();
     private final IntakeAngle intakeAngle = new IntakeAngle();
 
-    private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 50, angle);
-    private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 50, angle);
-    private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 50, angle);
+    private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 50, angleSys);
+    private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 50, angleSys);
+    private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 50, angleSys);
 
     /* Command Definitions */
-    private final AutoAimToShoot autoAimToShootCommand = new AutoAimToShoot(s_Swerve);
-    private final AutoRiseToAngle autoRiseToAngleCommand = new AutoRiseToAngle(angle, s_Swerve);
+    private final AutoAimToShoot autoAimToShootCommand = new AutoAimToShoot(swerve);
+    private final AutoRiseToAngle autoRiseToAngleCommand = new AutoRiseToAngle(angleSys, swerve);
 
     private final Command pickUpNoteCommand = new InstantCommand(() -> {
             midIntake.rawMove(-1);
@@ -134,7 +132,7 @@ public class RobotContainer {
             midIntake.rawMove(0);
         });
     private final Command autoGrabNoteCommand = new SequentialCommandGroup(
-            new AutoAimNote(s_Swerve, bottomIntake.getCamera()),
+            new AutoAimNote(swerve, bottomIntake.getCamera()),
             new ParallelDeadlineGroup(
                 /* PICK UP NOTE COMMAND */
                 new InstantCommand(() -> {
@@ -145,16 +143,15 @@ public class RobotContainer {
                     midIntake.rawMove(0);
                 })
                 /* PICK UP NOTE COMMAND END */,
-                s_Swerve.run(() -> s_Swerve.driveChassis(new ChassisSpeeds(1.5, 0, 0)))
+                swerve.run(() -> swerve.driveChassis(new ChassisSpeeds(1.5, 0, 0)))
             ),
-            s_Swerve.runOnce(() -> s_Swerve.driveChassis(new ChassisSpeeds(0, 0, 0)))
+            swerve.runOnce(() -> swerve.driveChassis(new ChassisSpeeds(0, 0, 0)))
         );
     private final Command autoShootCommand = new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> autoRiseToAngleCommand.isFinished()).withTimeout(2),
                 new WaitUntilCommand(() -> shooter.rpmOk()).withTimeout(2),
                 new WaitUntilCommand(() -> autoAimToShootCommand.isFinished()).withTimeout(2),
-                new InstantCommand(() -> ledStrip.shooterReady(true)),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
             autoAimToShootCommand.repeatedly(),
@@ -162,7 +159,6 @@ public class RobotContainer {
         ).finallyDo(() -> {
             shooter.idle();
             midIntake.rawMove(0);
-            ledStrip.shooterReady(false);
         });
 
     private final SendableChooser<Command> autoChooser;
@@ -170,9 +166,9 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         // Set default commands
-        s_Swerve.setDefaultCommand(
+        swerve.setDefaultCommand(
             new TeleopSwerve(
-                s_Swerve,
+                swerve,
                 translationAxis,
                 strafeAxis,
                 rotationAxis,
@@ -181,13 +177,14 @@ public class RobotContainer {
             )
         );
         shooter.setDefaultCommand(shooter.idle());
-        angle.setDefaultCommand(autoRiseToAngleCommand.repeatedly());
+        angleSys.setDefaultCommand(autoRiseToAngleCommand.repeatedly());
         climber.setDefaultCommand(climber.run(() -> climber.move(leftClimbAxis, rightClimbAxis)));
         intakeAngle.setDefaultCommand(intakeAngle.run(() -> intakeAngle.rawMove(bottomIntakeAxis.getAsDouble() * 0.5)));
 
         // Register named commands
         NamedCommands.registerCommand("PickUpNote", pickUpNoteCommand);
         NamedCommands.registerCommand("Shoot", autoShootCommand);
+        NamedCommands.registerCommand("DropIntake", intakeAngle.drop(angleSys));
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -204,7 +201,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
-        driverCancelSwerveBtn.onTrue(s_Swerve.runOnce(() -> s_Swerve.driveChassis(new ChassisSpeeds())));
+        driverCancelSwerveBtn.onTrue(swerve.runOnce(() -> swerve.driveChassis(new ChassisSpeeds())));
         autoPickupButton.onTrue(autoGrabNoteCommand);
         autoShootButton.onTrue(autoShootCommand);
         autoDriveToAmpPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToAmpShootSpot"), Constants.defaultPathConstraints));
@@ -219,19 +216,19 @@ public class RobotContainer {
         ));
 
         /* Operator Buttons */
-        manualAngleUpBtn.whileTrue(angle.run(() -> angle.move(0.5)).repeatedly().finallyDo(() -> angle.move(0)));
-        manualAngleDownBtn.whileTrue(angle.run(() -> angle.move(-0.5)).repeatedly().finallyDo(() -> angle.move(0)));
+        manualAngleUpBtn.whileTrue(angleSys.run(() -> angleSys.move(0.5)).repeatedly().finallyDo(() -> angleSys.move(0)));
+        manualAngleDownBtn.whileTrue(angleSys.run(() -> angleSys.move(-0.5)).repeatedly().finallyDo(() -> angleSys.move(0)));
         manualMidIntakeUpBtn.whileTrue(midIntake.run(() -> midIntake.rawMove(-0.7)).repeatedly().finallyDo(() -> midIntake.rawMove(0)));
         manualMidIntakeDownBtn.whileTrue(midIntake.run(() -> midIntake.rawMove(0.7)).repeatedly().finallyDo(() -> midIntake.rawMove(0)));
-        resetAngleBtn.onTrue(new InstantCommand(() -> angle.reset()));
+        resetAngleBtn.onTrue(new InstantCommand(() -> angleSys.reset()));
         compositeKillBtn.whileTrue(new InstantCommand(() -> {
-            s_Swerve.driveChassis(new ChassisSpeeds());
+            swerve.driveChassis(new ChassisSpeeds());
             midIntake.rawMove(0);
             bottomIntake.rawMove(0);
             shooter.stop();
-            angle.move(0);
+            angleSys.move(0);
             climber.move(() -> 0, () -> 0);
-        }, s_Swerve, midIntake, bottomIntake, shooter, angle, climber));
+        }, swerve, midIntake, bottomIntake, shooter, angleSys, climber));
         manualPickupBtn.onTrue(pickUpNoteCommand);
         trap1Btn.onTrue(new ParallelDeadlineGroup(
             new SequentialCommandGroup(
@@ -246,7 +243,7 @@ public class RobotContainer {
         trap2Btn.onTrue(new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 AutoBuilder.pathfindThenFollowPath(
-                    PathPlannerPath.fromPathFile("ToTrap2"), Constants.defaultPathConstraints),
+                    PathPlannerPath.fromPathFile("ToTrap2"), new PathConstraints(2.5, 5, Math.toRadians(420), Math.toRadians(720))),
                 new WaitUntilCommand(() -> riseToTrap2Angle.isFinished()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
@@ -256,7 +253,7 @@ public class RobotContainer {
         trap3Btn.onTrue(new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 AutoBuilder.pathfindThenFollowPath(
-                    PathPlannerPath.fromPathFile("ToTrap3"), Constants.defaultPathConstraints),
+                    PathPlannerPath.fromPathFile("ToTrap3"), new PathConstraints(2.5, 5, Math.toRadians(420), Math.toRadians(720))),
                 new WaitUntilCommand(() -> riseToTrap3Angle.isFinished()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
@@ -264,7 +261,7 @@ public class RobotContainer {
             shooter.shootRepeatedly()
         ).finallyDo(() -> midIntake.rawMove(0)));
         // manualStartShooterBtn.onTrue(shooter.shootRepeatedly());
-        manualStartShooterBtn.onTrue(intakeAngle.drop());
+        manualStartShooterBtn.onTrue(intakeAngle.drop(angleSys)); // TODO: debug here
     }
 
     /**

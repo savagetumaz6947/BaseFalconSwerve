@@ -21,10 +21,12 @@ public class IntakeAngle extends SubsystemBase {
         motor.set(value);
     }
 
-    public Command drop () {
-        return this.runOnce(() -> {
-            rawMove(1);
-        }).repeatedly().withTimeout(0.3);
+    public Command drop(AngleSys angleSys) {
+        Command command = this.runOnce(() -> {
+            rawMove(0.5);
+        }).repeatedly().withTimeout(0.5);
+        command.addRequirements(angleSys);
+        return command;
     }
 
     @Override

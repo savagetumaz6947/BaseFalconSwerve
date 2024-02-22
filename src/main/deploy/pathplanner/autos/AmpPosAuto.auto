@@ -6,6 +6,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "DropIntake"
+          }
+        },
+        {
           "type": "deadline",
           "data": {
             "commands": [

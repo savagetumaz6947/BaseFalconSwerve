@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 
 public class TeleopSwerve extends Command {    
-    private Swerve s_Swerve;    
+    private Swerve swerve;    
     private DoubleSupplier translationSup;
     private DoubleSupplier strafeSup;
     private DoubleSupplier rotationSup;
@@ -24,9 +24,9 @@ public class TeleopSwerve extends Command {
     private SlewRateLimiter translateXLimiter = new SlewRateLimiter(Constants.Swerve.teleopMaxTranslateAcceleration);
     private SlewRateLimiter translateYLimiter = new SlewRateLimiter(Constants.Swerve.teleopMaxTranslateAcceleration);
 
-    public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup, IntSupplier maxSpeedMode) {
-        this.s_Swerve = s_Swerve;
-        addRequirements(s_Swerve);
+    public TeleopSwerve(Swerve swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup, IntSupplier maxSpeedMode) {
+        this.swerve = swerve;
+        addRequirements(swerve);
 
         this.translationSup = translationSup;
         this.strafeSup = strafeSup;
@@ -34,7 +34,7 @@ public class TeleopSwerve extends Command {
         this.robotCentricSup = robotCentricSup;
         this.maxSpeedMode = maxSpeedMode;
 
-        s_Swerve.navx.reset();
+        swerve.navx.reset();
     }
 
     @Override
@@ -43,7 +43,7 @@ public class TeleopSwerve extends Command {
         SmartDashboard.putNumber("Max Speed", Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]);
 
         /* Drive */
-        s_Swerve.drive(
+        swerve.drive(
             new Translation2d(
                 translateXLimiter.calculate(this.translationSup.getAsDouble() * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()]),
                 translateYLimiter.calculate(this.strafeSup.getAsDouble() * Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()])
