@@ -149,7 +149,7 @@ public class RobotContainer {
         );
     private final Command autoShootCommand = new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new WaitUntilCommand(() -> autoRiseToAngleCommand.isFinished()).withTimeout(2),
+                // new WaitUntilCommand(() -> autoRiseToAngleCommand.isFinished()).withTimeout(2),
                 new WaitUntilCommand(() -> shooter.rpmOk()).withTimeout(2),
                 new WaitUntilCommand(() -> autoAimToShootCommand.isFinished()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
@@ -177,7 +177,7 @@ public class RobotContainer {
             )
         );
         shooter.setDefaultCommand(shooter.idle());
-        angleSys.setDefaultCommand(autoRiseToAngleCommand.repeatedly());
+        // angleSys.setDefaultCommand(autoRiseToAngleCommand.repeatedly());
         climber.setDefaultCommand(climber.run(() -> climber.move(leftClimbAxis, rightClimbAxis)));
         intakeAngle.setDefaultCommand(intakeAngle.run(() -> intakeAngle.rawMove(bottomIntakeAxis.getAsDouble() * 0.5)));
 
