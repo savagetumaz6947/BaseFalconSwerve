@@ -69,6 +69,7 @@ public class RobotContainer {
             return driver.getRawButton(XboxController.Button.kX.value);
         }
     });
+    private final Trigger autoAimWhileDriveToggle = new Trigger(() -> driver.getPOV() == 270);
     private final JoystickButton autoDriveToSourceBtn = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton driverCancelSwerveBtn = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     private final JoystickButton fodButton = new JoystickButton(driver, XboxController.Button.kStart.value);
@@ -106,6 +107,7 @@ public class RobotContainer {
     private final JoystickButton manualStartShooterBtn = new JoystickButton(operator, XboxController.Button.kA.value);
 
     private int maxSpeedMode = 1;
+    private boolean enableAutoAimWhileDrive = true;
 
     /* Subsystems */
     private final LedStrip ledStrip = new LedStrip();
@@ -124,6 +126,16 @@ public class RobotContainer {
     private final AutoAimToShoot autoAimToShootCommand = new AutoAimToShoot(s_Swerve);
     private final AutoRiseToAngle autoRiseToAngleCommand = new AutoRiseToAngle(angle, s_Swerve);
 
+    private final TeleopSwerve teleopSwerve = new TeleopSwerve(
+                s_Swerve,
+                translationAxis,
+                strafeAxis,
+                rotationAxis,
+                () -> !fodButton.getAsBoolean(),
+                () -> maxSpeedMode,
+                shooter::inRange,
+                () -> enableAutoAimWhileDrive
+            );
     private final Command pickUpNoteCommand = new InstantCommand(() -> {
             midIntake.rawMove(-.7);
             bottomIntake.rawMove(0.5);
@@ -147,7 +159,7 @@ public class RobotContainer {
             ),
             s_Swerve.runOnce(() -> s_Swerve.driveChassis(new ChassisSpeeds(0, 0, 0)))
         );
-    private final Command autoShootCommand = new ParallelDeadlineGroup(
+    private final Command autoShootCommandInAuto = new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> autoRiseToAngleCommand.isFinished()).withTimeout(2),
                 new WaitUntilCommand(() -> shooter.rpmOk()).withTimeout(2),
@@ -162,22 +174,27 @@ public class RobotContainer {
             midIntake.rawMove(0);
             ledStrip.shooterReady(false);
         });
+    private final Command autoAimToShootCommandInTeleop = new ParallelDeadlineGroup(
+            new SequentialCommandGroup(
+                new WaitUntilCommand(() -> autoRiseToAngleCommand.isFinished()).withTimeout(2),
+                new WaitUntilCommand(() -> shooter.rpmOk()).withTimeout(2),
+                new WaitUntilCommand(() -> teleopSwerve.atSetpoint()).withTimeout(2),
+                new InstantCommand(() -> ledStrip.shooterReady(true)),
+                midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
+            ),
+            shooter.shootRepeatedly()
+        ).finallyDo(() -> {
+            shooter.idle();
+            midIntake.rawMove(0);
+            ledStrip.shooterReady(false);
+        });
 
     private final SendableChooser<Command> autoChooser;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         // Set default commands
-        s_Swerve.setDefaultCommand(
-            new TeleopSwerve(
-                s_Swerve,
-                translationAxis,
-                strafeAxis,
-                rotationAxis,
-                () -> !fodButton.getAsBoolean(),
-                () -> maxSpeedMode
-            )
-        );
+        s_Swerve.setDefaultCommand(teleopSwerve);
         shooter.setDefaultCommand(shooter.idle());
         angle.setDefaultCommand(autoRiseToAngleCommand.repeatedly());
         climber.setDefaultCommand(climber.run(() -> climber.move(leftClimbAxis, rightClimbAxis)));
@@ -185,7 +202,7 @@ public class RobotContainer {
 
         // Register named commands
         NamedCommands.registerCommand("PickUpNote", pickUpNoteCommand);
-        NamedCommands.registerCommand("Shoot", autoShootCommand);
+        NamedCommands.registerCommand("Shoot", autoShootCommandInAuto);
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -202,17 +219,18 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
+        autoAimWhileDriveToggle.toggleOnTrue(new InstantCommand(() -> enableAutoAimWhileDrive = !enableAutoAimWhileDrive));
         driverCancelSwerveBtn.onTrue(s_Swerve.runOnce(() -> s_Swerve.driveChassis(new ChassisSpeeds())));
         autoPickupButton.onTrue(autoGrabNoteCommand);
-        autoShootButton.onTrue(autoShootCommand);
+        autoShootButton.onTrue(autoAimToShootCommandInTeleop);
         autoDriveToAmpPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToAmpShootSpot"), Constants.defaultPathConstraints));
         autoDriveToMidPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToMidShootSpot"), Constants.defaultPathConstraints));
         autoDriveToStagePosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToStageShootSpot"), Constants.defaultPathConstraints));
         autoDriveToSourceBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToSource"), Constants.defaultPathConstraints));
-        maxSpeedUp.onTrue(new InstantCommand(() ->
+        maxSpeedUp.toggleOnTrue(new InstantCommand(() ->
             maxSpeedMode = maxSpeedMode + 1 < Constants.Swerve.speedSelection.length ? maxSpeedMode + 1 : maxSpeedMode
         ));
-        maxSpeedDown.onTrue(new InstantCommand(() ->
+        maxSpeedDown.toggleOnTrue(new InstantCommand(() ->
             maxSpeedMode = maxSpeedMode - 1 >= 0 ? maxSpeedMode - 1 : maxSpeedMode
         ));
 
