@@ -41,7 +41,7 @@ public class AngleSys extends SubsystemBase {
     }
 
     public double getAngle() {
-        return encoder.getPosition() * 360 + 29;
+        return encoder.getPosition() * 360 + 27;
     }
 
     /**
@@ -51,7 +51,7 @@ public class AngleSys extends SubsystemBase {
      */
     public double getAutoAngle(double dist) {
         double value = (55.2 - 6.09 * dist);
-        if (value < 29) return 29;
+        if (value < 27) return 27;
         else if (value > 60) return 60;
         return value; // Refer to Google Sheets
     }

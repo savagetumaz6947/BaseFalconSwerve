@@ -127,7 +127,7 @@ public class RobotContainer {
     private final AutoRiseToAngle autoRiseToAngleCommand = new AutoRiseToAngle(angle, s_Swerve);
 
     private final Command pickUpNoteCommand = new InstantCommand(() -> {
-            midIntake.rawMove(-.7);
+            midIntake.rawMove(-1);
             bottomIntake.rawMove(0.5);
         }, midIntake, bottomIntake).repeatedly().until(() -> midIntake.hasNote()).finallyDo(() -> {
             bottomIntake.rawMove(0);
@@ -138,7 +138,7 @@ public class RobotContainer {
             new ParallelDeadlineGroup(
                 /* PICK UP NOTE COMMAND */
                 new InstantCommand(() -> {
-                    midIntake.rawMove(-.7);
+                    midIntake.rawMove(-1);
                     bottomIntake.rawMove(0.5);
                 }, midIntake, bottomIntake).repeatedly().until(() -> midIntake.hasNote()).finallyDo(() -> {
                     bottomIntake.rawMove(0);
@@ -263,7 +263,8 @@ public class RobotContainer {
             riseToTrap3Angle.repeatedly(),
             shooter.shootRepeatedly()
         ).finallyDo(() -> midIntake.rawMove(0)));
-        manualStartShooterBtn.onTrue(shooter.shootRepeatedly());
+        // manualStartShooterBtn.onTrue(shooter.shootRepeatedly());
+        manualStartShooterBtn.onTrue(intakeAngle.drop());
     }
 
     /**
