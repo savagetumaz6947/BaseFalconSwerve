@@ -32,6 +32,7 @@ import frc.robot.commands.Shooting.AutoAimToShoot;
 import frc.robot.subsystems.AngleSys;
 import frc.robot.subsystems.BottomIntake;
 import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.IntakeAngle;
 import frc.robot.subsystems.LedStrip;
 import frc.robot.subsystems.MidIntake;
 
@@ -115,6 +116,7 @@ public class RobotContainer {
     private final Shooter shooter = new Shooter(s_Swerve);
     private final AngleSys angle = new AngleSys();
     private final Climber climber = new Climber();
+    private final IntakeAngle intakeAngle = new IntakeAngle();
 
     private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 50, angle);
     private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 50, angle);
@@ -181,7 +183,7 @@ public class RobotContainer {
         shooter.setDefaultCommand(shooter.idle());
         angle.setDefaultCommand(autoRiseToAngleCommand.repeatedly());
         climber.setDefaultCommand(climber.run(() -> climber.move(leftClimbAxis, rightClimbAxis)));
-        bottomIntake.setDefaultCommand(bottomIntake.run(() -> bottomIntake.rawMove(bottomIntakeAxis.getAsDouble() * 0.5)));
+        intakeAngle.setDefaultCommand(intakeAngle.run(() -> intakeAngle.rawMove(bottomIntakeAxis.getAsDouble() * 0.5)));
 
         // Register named commands
         NamedCommands.registerCommand("PickUpNote", pickUpNoteCommand);

@@ -69,7 +69,6 @@ public class AngleSys extends SubsystemBase {
 
     public void reset() {
         encoder.setPosition(0);
-        leftMotor.setControl(new MusicTone(442));
     }
 
     @Override
