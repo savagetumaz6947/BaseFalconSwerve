@@ -24,7 +24,9 @@ public class IntakeAngle extends SubsystemBase {
     public Command drop(AngleSys angleSys) {
         Command command = this.runOnce(() -> {
             rawMove(0.5);
-        }).repeatedly().withTimeout(0.5);
+        }).repeatedly().withTimeout(0.7).finallyDo(() -> {
+            rawMove(0);
+        });
         command.addRequirements(angleSys);
         return command;
     }

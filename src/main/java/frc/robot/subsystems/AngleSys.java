@@ -41,7 +41,7 @@ public class AngleSys extends SubsystemBase {
     }
 
     public double getAngle() {
-        return encoder.getPosition() * 360 + 27;
+        return encoder.getPosition() * 360 + 29;
     }
 
     /**

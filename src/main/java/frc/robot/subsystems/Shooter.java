@@ -18,12 +18,14 @@ public class Shooter extends SubsystemBase {
     private Swerve swerve;
 
     public Shooter(Swerve swerve) {
-        down.follow(up, true);
         this.swerve = swerve;
     }
 
     public Command shootRepeatedly() {
-        return this.runEnd(() -> up.set(-1), () -> up.set(0));
+        return this.runEnd(() -> {
+            up.set(-1);
+            down.set(1);
+        }, () -> up.set(0));
     }
 
     public boolean inRange() {
@@ -34,24 +36,34 @@ public class Shooter extends SubsystemBase {
         return new InstantCommand(() -> {
             if (inRange()) {
                 up.set(-0.2);
+                down.set(0.2);
             } else {
                 up.set(0);
+                down.set(0);
             }
         }, this).repeatedly().finallyDo(() -> {
             up.set(0);
+            down.set(0);
         });
     }
 
     public Command revIdle() {
-        return this.runEnd(() -> up.set(0.3), () -> up.set(0));
+        return this.runEnd(() -> {
+            up.set(0.3);
+            down.set(-0.3);
+        }, () -> {
+            up.set(0);
+            down.set(0);
+        });
     }
 
     public void stop() {
         up.set(0);
+        down.set(0);
     }
 
     public boolean rpmOk() {
-        return up.getEncoder().getVelocity() <= -4500;
+        return up.getEncoder().getVelocity() <= -4800;
     }
 
     @Override

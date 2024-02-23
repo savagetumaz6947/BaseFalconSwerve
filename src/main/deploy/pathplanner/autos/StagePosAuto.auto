@@ -6,7 +6,7 @@
     "data": {
       "commands": [
         {
-          "type": "deadline",
+          "type": "sequential",
           "data": {
             "commands": [
               {
@@ -32,13 +32,19 @@
                       }
                     },
                     {
+                      "type": "path",
+                      "data": {
+                        "pathName": "ToStageNote"
+                      }
+                    },
+                    {
                       "type": "race",
                       "data": {
                         "commands": [
                           {
                             "type": "path",
                             "data": {
-                              "pathName": "ToStageNote"
+                              "pathName": "ToStageAutoShootSpot"
                             }
                           },
                           {
@@ -63,7 +69,7 @@
                           {
                             "type": "path",
                             "data": {
-                              "pathName": "ToNote4"
+                              "pathName": "ToNote5"
                             }
                           },
                           {
@@ -94,7 +100,7 @@
                           {
                             "type": "path",
                             "data": {
-                              "pathName": "ToNote5"
+                              "pathName": "ToNote4"
                             }
                           },
                           {

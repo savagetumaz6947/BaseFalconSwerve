@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.896942369383314,
-        "y": 5.55
+        "x": 2.3062377748687117,
+        "y": 4.116342363738859
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2113981994311045,
-        "y": 5.55
+        "x": 2.1062377748687116,
+        "y": 4.116342363738859
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "StageAutoPickupSpot"
     },
     {
       "anchor": {
-        "x": 2.0,
-        "y": 5.55
+        "x": 1.6513651260920754,
+        "y": 4.116342363738859
       },
       "prevControl": {
-        "x": 2.0021897593652738,
-        "y": 5.531335051274091
+        "x": 1.8513651260920754,
+        "y": 4.116342363738859
       },
       "nextControl": null,
       "isLocked": false,
@@ -39,11 +39,14 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "FirstShootSpot",
-  "previewStartingState": null,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
   "useDefaultConstraints": true
 }
