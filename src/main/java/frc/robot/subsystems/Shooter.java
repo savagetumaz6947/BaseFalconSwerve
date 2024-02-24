@@ -29,7 +29,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean inRange() {
-        return swerve.getAngleToSpeaker() < 3.5;
+        return swerve.getDistToSpeaker() < 3.5;
     }
 
     public Command idle() {
@@ -55,6 +55,11 @@ public class Shooter extends SubsystemBase {
             up.set(0);
             down.set(0);
         });
+    }
+
+    public void reverse() {
+        up.set(0.5);
+        down.set(-0.5);
     }
 
     public void stop() {

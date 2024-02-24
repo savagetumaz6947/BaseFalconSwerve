@@ -5,13 +5,20 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import frc.robot.subsystems.drivetrain.Swerve;
 
 public class AutoAimToShoot extends PIDCommand {
     public AutoAimToShoot(Swerve swerve) {
         super(new PIDController(10, 0, 1.0),
-            () -> swerve.getPose().getRotation().getDegrees(),
+            () -> {
+                if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+                    return swerve.getPose().getRotation().getDegrees();
+                }
+                return (swerve.getPose().getRotation().getDegrees() + 360) % 360;
+            },
             () -> Math.toDegrees(swerve.getAngleToSpeaker()),
             (double omega_per_second) -> {
                 swerve.driveChassis(new ChassisSpeeds(0, 0, Math.toRadians(omega_per_second)));

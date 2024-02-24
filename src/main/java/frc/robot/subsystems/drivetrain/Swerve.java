@@ -175,8 +175,8 @@ public class Swerve extends SubsystemBase {
             return Math.atan((pose.getY() - Constants.GameObjects.BlueAlliance.speaker.getY()) / 
                                 (pose.getX() - Constants.GameObjects.BlueAlliance.speaker.getX()));
         else
-            return Math.PI + Math.atan((pose.getY() - Constants.GameObjects.RedAlliance.speaker.getY()) / 
-                                (pose.getX() - Constants.GameObjects.RedAlliance.speaker.getX()));
+            return (Math.PI + Math.atan((pose.getY() - Constants.GameObjects.RedAlliance.speaker.getY()) / 
+                                (pose.getX() - Constants.GameObjects.RedAlliance.speaker.getX())) + (Math.PI * 2)) % (Math.PI * 2);
     }
 
     public Command getTrapCommand (int trapNum, Command riseToTrapAngle, Shooter shooter, MidIntake midIntake) {

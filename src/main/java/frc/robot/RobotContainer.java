@@ -116,9 +116,9 @@ public class RobotContainer {
     private final Climber climber = new Climber();
     private final IntakeAngle intakeAngle = new IntakeAngle();
 
-    private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 50, angleSys);
-    private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 50, angleSys);
-    private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 50, angleSys);
+    private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 58.5, angleSys);
+    private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 61, angleSys);
+    private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 61, angleSys);
 
     /* Command Definitions */
     private final AutoAimToShoot autoAimToShootCommand = new AutoAimToShoot(swerve);
@@ -261,7 +261,8 @@ public class RobotContainer {
             shooter.shootRepeatedly()
         ).finallyDo(() -> midIntake.rawMove(0)));
         // manualStartShooterBtn.onTrue(shooter.shootRepeatedly());
-        manualStartShooterBtn.onTrue(intakeAngle.drop(angleSys)); // TODO: debug here
+        // manualStartShooterBtn.onTrue(intakeAngle.drop(angleSys)); // TODO: debug here
+        manualStartShooterBtn.whileTrue(shooter.run(() -> shooter.reverse()).andThen(shooter.idle()));
     }
 
     /**
