@@ -78,6 +78,12 @@
                     {
                       "type": "path",
                       "data": {
+                        "pathName": "Note1ToAmpShoot"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
                         "pathName": "ToAmpShootSpot"
                       }
                     },
@@ -104,6 +110,12 @@
                             }
                           }
                         ]
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Note2ToAmpShootSpot"
                       }
                     },
                     {

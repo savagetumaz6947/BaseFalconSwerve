@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.3135235820021185,
-        "y": 7.044463818657367
+        "x": 8.288745946857311,
+        "y": 6.101504094903677
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.658650933219401,
-        "y": 7.021075509779018
+        "x": 7.273988746171738,
+        "y": 7.544704979303444
       },
       "isLocked": false,
-      "linkedName": "AmpShootSpotStart"
+      "linkedName": "Note2"
     },
     {
       "anchor": {
-        "x": 2.5518150181599504,
-        "y": 6.794303731057604
+        "x": 4.3135235820021185,
+        "y": 7.044463818657367
       },
       "prevControl": {
-        "x": 3.538208941992094,
-        "y": 6.958702718362961
+        "x": 6.929774580269881,
+        "y": 6.9797508964387305
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "AmpShootSpot"
+      "linkedName": "AmpShootSpotStart"
     }
   ],
   "rotationTargets": [],
@@ -39,11 +39,14 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 31.492625629862754,
+    "rotation": 0,
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "ShootSpot",
-  "previewStartingState": null,
+  "folder": "AutoBackToShootSpot",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
   "useDefaultConstraints": true
 }

@@ -4,8 +4,9 @@
   "holonomicMode": true,
   "pathFolders": [
     "FirstShootSpot",
-    "Trap",
-    "ShootSpot"
+    "AutoBackToShootSpot",
+    "ShootSpot",
+    "Trap"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.3,
