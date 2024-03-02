@@ -118,6 +118,7 @@ public class RobotContainer {
     private final IntakeAngle intakeAngle = new IntakeAngle();
     private final LedStrip ledStrip = new LedStrip();
 
+    private final RiseToAngle resetAngle = new RiseToAngle(() -> 30, angleSys);
     private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 58.5, angleSys);
     private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 61, angleSys);
     private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 61, angleSys);
@@ -158,11 +159,13 @@ public class RobotContainer {
             ),
             autoAimToShootCommand.repeatedly(),
             autoRiseToAngleCommand.repeatedly(),
-            shooter.shootRepeatedly()
+            shooter.shootRepeatedly(),
+            new InstantCommand(() -> ledStrip.shoot(true))
         ).finallyDo(() -> {
             shooter.idle();
             midIntake.rawMove(0);
-        });
+            ledStrip.shoot(false);
+        }).andThen(resetAngle);
 
     private final SendableChooser<Command> autoChooser;
 
