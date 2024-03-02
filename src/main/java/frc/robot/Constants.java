@@ -31,7 +31,7 @@ public final class Constants {
     public static final class Vision {
         public static final String cameraName = "BackCamera";
         // Cam mounted facing foward, 54 degrees up, at the front of the robot, 23cm up.
-        public static final Transform3d robotToCam = new Transform3d(new Translation3d(-0.03-0.36,0,0.455), new Rotation3d(0, Math.toRadians(65.9-90),Math.PI));
+        public static final Transform3d robotToCam = new Transform3d(new Translation3d(0.02-0.36,0,0.52), new Rotation3d(0, Math.toRadians(58-90), Math.PI));
         // public static final Transform3d robotToCam = new Transform3d(new Translation3d(0,0,0), new Rotation3d(0, 0, 0));
 
         // public static final AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(List.of(
@@ -114,12 +114,12 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 4.5;  // TODO: This must be tuned to specific robot / This is the theoretical maxSpeed of your robot (aka the 100% value)
+        public static final double maxSpeed = 5.1;  // TODO: This must be tuned to specific robot / This is the theoretical maxSpeed of your robot (aka the 100% value)
                                                         //   You can ignore this value if "isOpenLoop" is set to FALSE
-        public static final double[] speedSelection = {1.3, 2.5, 4.5}; //TODO: You can set this to your desired speed
+        public static final double[] speedSelection = {1.3, 2.5, 4.5, 5.1}; //TODO: You can set this to your desired speed
         public static final double autonomousMaxSpeedSelection  = 4.5; // This refers to the index of the speedSelection defined on top by speedSelection[] used by Autonomous mode
 
-        public static final double teleopMaxTranslateAcceleration = 8;
+        public static final double teleopMaxTranslateAcceleration = 15;
         /** Radians per Second */
         public static final double maxAngularVelocity = Units.degreesToRadians(420); //TODO: This must be tuned to specific robot
 

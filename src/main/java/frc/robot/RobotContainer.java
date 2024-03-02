@@ -33,6 +33,7 @@ import frc.robot.subsystems.AngleSys;
 import frc.robot.subsystems.BottomIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.IntakeAngle;
+import frc.robot.subsystems.LedStrip;
 import frc.robot.subsystems.MidIntake;
 
 /**
@@ -115,6 +116,7 @@ public class RobotContainer {
     private final AngleSys angleSys = new AngleSys();
     private final Climber climber = new Climber();
     private final IntakeAngle intakeAngle = new IntakeAngle();
+    private final LedStrip ledStrip = new LedStrip();
 
     private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 58.5, angleSys);
     private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 61, angleSys);
@@ -155,6 +157,7 @@ public class RobotContainer {
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
             autoAimToShootCommand.repeatedly(),
+            autoRiseToAngleCommand.repeatedly(),
             shooter.shootRepeatedly()
         ).finallyDo(() -> {
             shooter.idle();
@@ -177,7 +180,7 @@ public class RobotContainer {
             )
         );
         shooter.setDefaultCommand(shooter.idle());
-        angleSys.setDefaultCommand(autoRiseToAngleCommand.repeatedly());
+        // angleSys.setDefaultCommand(autoRiseToAngleCommand.repeatedly());
         climber.setDefaultCommand(climber.run(() -> climber.move(leftClimbAxis, rightClimbAxis)));
         intakeAngle.setDefaultCommand(intakeAngle.run(() -> intakeAngle.rawMove(bottomIntakeAxis.getAsDouble() * 0.5)));
 
