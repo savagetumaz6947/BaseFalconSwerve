@@ -26,18 +26,19 @@ public class LedStrip extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (shooting) {
+            buffer.setLED(position % 32, Color.kGreen);
+            buffer.setLED((position - 7) % 32, Color.kBlack);
+            position++;
+            led.setData(buffer);
+            return;
+        }
+
         if (SmartDashboard.getBoolean("HasNote", false)) {
             for (int i = 0; i < buffer.getLength(); i++) {
                 buffer.setLED(i, Color.kOrange);
             }
             position = 7;
-            led.setData(buffer);
-            return;
-        }
-        if (shooting) {
-            buffer.setLED(position % 32, Color.kGreen);
-            buffer.setLED((position - 7) % 32, Color.kBlack);
-            position++;
             led.setData(buffer);
             return;
         }
