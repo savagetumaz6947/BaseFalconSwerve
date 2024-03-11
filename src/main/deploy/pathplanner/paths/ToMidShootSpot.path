@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.137874221694389,
-        "y": 5.537577201280529
+        "x": 4.14,
+        "y": 5.54
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.4830015729116717,
-        "y": 5.51418889240218
+        "x": 3.4851273512172822,
+        "y": 5.516611691121651
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "MidShootSpotStart"
     },
     {
       "anchor": {
-        "x": 2.640232307491642,
-        "y": 5.537577201280529
+        "x": 2.5401208637175103,
+        "y": 5.57
       },
       "prevControl": {
-        "x": 3.3890532645930156,
-        "y": 5.528332498106438
+        "x": 3.288941820818884,
+        "y": 5.560755296825909
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "MidShootSpot"
     }
   ],
   "rotationTargets": [],

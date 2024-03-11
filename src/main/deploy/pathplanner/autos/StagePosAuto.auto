@@ -32,19 +32,13 @@
                       }
                     },
                     {
-                      "type": "path",
-                      "data": {
-                        "pathName": "ToStageNote"
-                      }
-                    },
-                    {
                       "type": "race",
                       "data": {
                         "commands": [
                           {
                             "type": "path",
                             "data": {
-                              "pathName": "ToStageAutoShootSpot"
+                              "pathName": "ToStageNote"
                             }
                           },
                           {
@@ -54,6 +48,12 @@
                             }
                           }
                         ]
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "ToStageAutoShootSpot"
                       }
                     },
                     {
@@ -79,6 +79,12 @@
                             }
                           }
                         ]
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Note5ToStageShootSpot"
                       }
                     },
                     {
@@ -110,6 +116,12 @@
                             }
                           }
                         ]
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Note4ToStageShootSpot"
                       }
                     },
                     {

@@ -12,20 +12,20 @@
         "y": 3.4667636902841377
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "StageShootSpotStart"
     },
     {
       "anchor": {
-        "x": 1.845187834519813,
-        "y": 4.141627021992783
+        "x": 1.6513651260920754,
+        "y": 4.116342363738859
       },
       "prevControl": {
-        "x": 2.2427100710057273,
-        "y": 3.5961895347214123
+        "x": 2.0488873625779895,
+        "y": 3.570904876467488
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "StageShootSpot"
     }
   ],
   "rotationTargets": [],

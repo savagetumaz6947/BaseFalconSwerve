@@ -3,37 +3,91 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.7,
-        "y": 2.4
+        "x": 1.6513651260920754,
+        "y": 4.116342363738859
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.4,
-        "y": 2.4
+        "x": 2.351365126092076,
+        "y": 4.116342363738859
+      },
+      "isLocked": false,
+      "linkedName": "StageShootSpot"
+    },
+    {
+      "anchor": {
+        "x": 3.483125256041348,
+        "y": 2.320442455607923
+      },
+      "prevControl": {
+        "x": 2.8984260112492986,
+        "y": 2.905141700399972
+      },
+      "nextControl": {
+        "x": 4.263105913389836,
+        "y": 1.5404617982594349
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.0,
-        "y": 2.4
+        "x": 5.0235870543046115,
+        "y": 1.0724734038503423
       },
       "prevControl": {
-        "x": 7.700044579835301,
-        "y": 2.394828354824745
+        "x": 4.4775135496865985,
+        "y": 1.0724734038503423
+      },
+      "nextControl": {
+        "x": 6.985251975741127,
+        "y": 1.0724734038503423
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.289756056951406,
+        "y": 1.2772183264043213
+      },
+      "prevControl": {
+        "x": 8.280006298734548,
+        "y": 0.9749758216817825
+      },
+      "nextControl": {
+        "x": 8.305158953190473,
+        "y": 1.7547081098153423
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.289756056951406,
+        "y": 2.1351970494876573
+      },
+      "prevControl": {
+        "x": 8.289756056951406,
+        "y": 1.5401422199176038
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Note4"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [
     {
       "name": "New Constraints Zone",
-      "minWaypointRelativePos": 0.7,
-      "maxWaypointRelativePos": 1.0,
+      "minWaypointRelativePos": 3.4,
+      "maxWaypointRelativePos": 4.0,
       "constraints": {
         "maxVelocity": 0.75,
         "maxAcceleration": 3.0,
@@ -51,7 +105,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 90.0,
     "rotateFast": true
   },
   "reversed": false,

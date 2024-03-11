@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.3062377748687117,
-        "y": 4.116342363738859
+        "x": 8.289756056951406,
+        "y": 2.1351970494876573
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.1062377748687116,
-        "y": 4.116342363738859
+        "x": 7.42904064430918,
+        "y": 1.8801438571960003
       },
       "isLocked": false,
-      "linkedName": "StageAutoPickupSpot"
+      "linkedName": "Note4"
     },
     {
       "anchor": {
-        "x": 1.6513651260920754,
-        "y": 4.116342363738859
+        "x": 4.39960252842121,
+        "y": 1.9304521269375086
       },
       "prevControl": {
-        "x": 1.8513651260920754,
-        "y": 4.116342363738859
+        "x": 6.1764385834623745,
+        "y": 0.8833880230739624
+      },
+      "nextControl": {
+        "x": 3.8536160682772684,
+        "y": 2.2521941480937606
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.1117121693702847,
+        "y": 3.1431990791909517
+      },
+      "prevControl": {
+        "x": 3.5005914144870536,
+        "y": 2.7041821885430584
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StageShootSpot"
+      "linkedName": "StageShootSpotStart"
     }
   ],
   "rotationTargets": [],
@@ -43,7 +59,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "AutoBackToShootSpot",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

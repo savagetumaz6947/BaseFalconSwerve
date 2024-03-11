@@ -3,28 +3,28 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.5401208637175103,
-        "y": 5.57
+        "x": 8.0,
+        "y": 4.1
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.540324239793373,
-        "y": 4.494638537970663
+        "x": 6.816337538656001,
+        "y": 4.1
       },
       "isLocked": false,
-      "linkedName": "MidShootSpot"
+      "linkedName": "Note3"
     },
     {
       "anchor": {
-        "x": 5.735319404130495,
+        "x": 5.316079800805683,
         "y": 4.1
       },
       "prevControl": {
-        "x": 4.6992113518922904,
+        "x": 6.203648802280766,
         "y": 4.1
       },
       "nextControl": {
-        "x": 7.763983960379756,
+        "x": 4.84179736966015,
         "y": 4.1
       },
       "isLocked": false,
@@ -32,43 +32,36 @@
     },
     {
       "anchor": {
-        "x": 8.0,
-        "y": 4.1
+        "x": 4.14,
+        "y": 5.54
       },
       "prevControl": {
-        "x": 6.3885465008069,
-        "y": 4.1
+        "x": 4.7408440660111735,
+        "y": 4.611635636572936
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Note3"
+      "linkedName": "MidShootSpotStart"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.3,
+      "waypointRelativePos": 0.75,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 0.8,
       "rotationDegrees": -60.0,
       "rotateFast": false
     },
     {
-      "waypointRelativePos": 0.9,
-      "rotationDegrees": 0.0,
+      "waypointRelativePos": 1.85,
+      "rotationDegrees": -60.0,
       "rotateFast": false
     }
   ],
-  "constraintZones": [
-    {
-      "name": "New Constraints Zone",
-      "minWaypointRelativePos": 1.4,
-      "maxWaypointRelativePos": 2.0,
-      "constraints": {
-        "maxVelocity": 0.75,
-        "maxAcceleration": 3.0,
-        "maxAngularVelocity": 240.0,
-        "maxAngularAcceleration": 240.0
-      }
-    }
-  ],
+  "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.3,
@@ -79,10 +72,13 @@
   "goalEndState": {
     "velocity": 0,
     "rotation": 0,
-    "rotateFast": true
+    "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
-  "previewStartingState": null,
+  "folder": "AutoBackToShootSpot",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
   "useDefaultConstraints": true
 }

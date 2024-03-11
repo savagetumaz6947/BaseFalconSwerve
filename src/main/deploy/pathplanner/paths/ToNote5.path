@@ -3,12 +3,28 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.7,
-        "y": 0.75
+        "x": 1.6513651260920754,
+        "y": 4.116342363738859
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.4,
+        "x": 1.757418051653207,
+        "y": 2.9444269814905426
+      },
+      "isLocked": false,
+      "linkedName": "StageShootSpot"
+    },
+    {
+      "anchor": {
+        "x": 6.242306831407013,
+        "y": 0.75
+      },
+      "prevControl": {
+        "x": 4.719669380626252,
+        "y": 0.75
+      },
+      "nextControl": {
+        "x": 7.764944282187773,
         "y": 0.75
       },
       "isLocked": false,
@@ -20,20 +36,20 @@
         "y": 0.75
       },
       "prevControl": {
-        "x": 7.700044579835301,
-        "y": 0.7448283548247452
+        "x": 7.469394622096552,
+        "y": 0.75
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Note5"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [
     {
       "name": "New Constraints Zone",
-      "minWaypointRelativePos": 0.7,
-      "maxWaypointRelativePos": 1.0,
+      "minWaypointRelativePos": 1.4,
+      "maxWaypointRelativePos": 2.0,
       "constraints": {
         "maxVelocity": 0.75,
         "maxAcceleration": 3.0,
