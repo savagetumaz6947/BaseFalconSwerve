@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LedStrip extends SubsystemBase {
     private AddressableLED led = new AddressableLED(1);
-    private AddressableLEDBuffer buffer = new AddressableLEDBuffer(64);
+    private AddressableLEDBuffer buffer = new AddressableLEDBuffer(62);
     private int position = 7;
 
     private boolean shooting = false;
@@ -19,6 +19,7 @@ public class LedStrip extends SubsystemBase {
         led.setLength(buffer.getLength());
         for (int i = 0; i < 7; i++) {
             buffer.setLED(i, Color.kWhite);
+            buffer.setLED(61 - i, Color.kWhite);
         }
         led.setData(buffer);
         led.start();
@@ -28,7 +29,9 @@ public class LedStrip extends SubsystemBase {
     public void periodic() {
         if (shooting) {
             buffer.setLED(position % 32, Color.kGreen);
+            buffer.setLED(61 - (position % 32), Color.kGreen);
             buffer.setLED((position - 7) % 32, Color.kBlack);
+            buffer.setLED(61 - ((position - 7) % 32), Color.kBlack);
             position++;
             led.setData(buffer);
             return;
@@ -46,12 +49,16 @@ public class LedStrip extends SubsystemBase {
         var alliance = DriverStation.getAlliance();
         if (alliance.isEmpty()) {
             buffer.setLED(position % 32, Color.kWhite);
+            buffer.setLED(61 - (position % 32), Color.kWhite);
         } else if (alliance.get() == Alliance.Blue) {
             buffer.setLED(position % 32, Color.kBlue);
+            buffer.setLED(61 - (position % 32), Color.kBlue);
         } else {
             buffer.setLED(position % 32, Color.kRed);
+            buffer.setLED(61 - (position % 32), Color.kRed);
         }
         buffer.setLED((position - 7) % 32, Color.kBlack);
+        buffer.setLED(61 - ((position - 7) % 32), Color.kBlack);
         position++;
         led.setData(buffer);
     }
@@ -61,9 +68,11 @@ public class LedStrip extends SubsystemBase {
         if (status == true) {
             for (int i = 0; i < 7; i++) {
                 buffer.setLED(i, Color.kGreen);
+                buffer.setLED(61 - i, Color.kGreen);
             }
             for (int i = 7; i < buffer.getLength(); i++) {
                 buffer.setLED(i, Color.kBlack);
+                buffer.setLED(61 - i, Color.kBlack);
             }
             position = 7;
         }

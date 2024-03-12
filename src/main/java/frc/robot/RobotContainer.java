@@ -75,6 +75,7 @@ public class RobotContainer {
     private final JoystickButton fodButton = new JoystickButton(driver, XboxController.Button.kStart.value);
     private final Trigger maxSpeedUp = new Trigger(() -> driver.getPOV() == 0);
     private final Trigger maxSpeedDown = new Trigger(() -> driver.getPOV() == 180);
+    private final Trigger autoAmpBtn = new Trigger(() -> driver.getPOV() == 270);
 
     /* Operator Controls */
     private final DoubleSupplier leftClimbAxis = () -> operator.getRawAxis(XboxController.Axis.kLeftY.value);
@@ -115,13 +116,14 @@ public class RobotContainer {
     private final Shooter shooter = new Shooter(swerve);
     private final AngleSys angleSys = new AngleSys();
     private final Climber climber = new Climber();
-    private final IntakeAngle intakeAngle = new IntakeAngle();
+    private final IntakeAngle intakeAngle = new IntakeAngle(angleSys::getAngle);
     private final LedStrip ledStrip = new LedStrip();
 
     private final RiseToAngle resetAngle = new RiseToAngle(() -> 30, angleSys);
     private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 58.5, angleSys);
     private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 61, angleSys);
     private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 61, angleSys);
+    private final RiseToAngle riseToAmpAngle = new RiseToAngle(() -> 40.3, angleSys);
 
     /* Command Definitions */
     private final AutoAimToShoot autoAimToShootCommand = new AutoAimToShoot(swerve);
@@ -150,10 +152,24 @@ public class RobotContainer {
             ),
             swerve.runOnce(() -> swerve.driveChassis(new ChassisSpeeds(0, 0, 0)))
         );
+    private final Command autoAmpCommand =  new ParallelDeadlineGroup(
+            new SequentialCommandGroup(
+                new WaitUntilCommand(() -> riseToAmpAngle.isFinished()).withTimeout(2),
+                new WaitUntilCommand(() -> shooter.rpmOkForAmp()).withTimeout(2),
+                midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
+            ),
+            riseToAmpAngle.repeatedly(),
+            shooter.shootRepeatedlyForAmp(),
+            new InstantCommand(() -> ledStrip.shoot(true))
+        ).finallyDo(() -> {
+            shooter.idle();
+            midIntake.rawMove(0);
+            ledStrip.shoot(false);
+        });
     private final Command autoShootCommand = new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> autoRiseToAngleCommand.isFinished()).withTimeout(2),
-                new WaitUntilCommand(() -> shooter.rpmOk()).withTimeout(2),
+                new WaitUntilCommand(() -> shooter.rpmOkForSpeaker()).withTimeout(2),
                 new WaitUntilCommand(() -> autoAimToShootCommand.isFinished()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
@@ -165,7 +181,7 @@ public class RobotContainer {
             shooter.idle();
             midIntake.rawMove(0);
             ledStrip.shoot(false);
-        }).andThen(resetAngle);
+        });
 
     private final SendableChooser<Command> autoChooser;
 
@@ -183,7 +199,7 @@ public class RobotContainer {
             )
         );
         shooter.setDefaultCommand(shooter.idle());
-        // angleSys.setDefaultCommand(autoRiseToAngleCommand.repeatedly());
+        angleSys.setDefaultCommand(resetAngle.repeatedly());
         climber.setDefaultCommand(climber.run(() -> climber.move(leftClimbAxis, rightClimbAxis)));
         intakeAngle.setDefaultCommand(intakeAngle.run(() -> intakeAngle.rawMove(bottomIntakeAxis.getAsDouble() * 0.5)));
 
@@ -269,6 +285,7 @@ public class RobotContainer {
         // manualStartShooterBtn.onTrue(shooter.shootRepeatedly());
         // manualStartShooterBtn.onTrue(intakeAngle.drop(angleSys)); // TODO: debug here
         manualStartShooterBtn.whileTrue(shooter.run(() -> shooter.reverse()).andThen(shooter.idle()));
+        autoAmpBtn.onTrue(autoAmpCommand);
     }
 
     /**

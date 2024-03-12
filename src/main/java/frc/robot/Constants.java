@@ -121,9 +121,9 @@ public final class Constants {
 
         public static final double teleopMaxTranslateAcceleration = 15;
         /** Radians per Second */
-        public static final double maxAngularVelocity = Units.degreesToRadians(420); //TODO: This must be tuned to specific robot
+        public static final double maxAngularVelocity = Units.degreesToRadians(540); //TODO: This must be tuned to specific robot
 
-        public static final double teleopMaxAngularAcceleration = Units.degreesToRadians(420);
+        public static final double teleopMaxAngularAcceleration = Units.degreesToRadians(720);
 
         /* Neutral Modes */
         public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;

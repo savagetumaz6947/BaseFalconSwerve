@@ -28,6 +28,14 @@ public class Shooter extends SubsystemBase {
         }, () -> up.set(0));
     }
 
+    public Command shootRepeatedlyForAmp() {
+        return this.runEnd(() -> {
+            up.set(-0.5);
+            down.set(.5);
+        }, () -> up.set(0));
+    }
+    // Amp 40.3 DEG
+
     public boolean inRange() {
         return swerve.getDistToSpeaker() < 3.5;
     }
@@ -67,8 +75,12 @@ public class Shooter extends SubsystemBase {
         down.set(0);
     }
 
-    public boolean rpmOk() {
+    public boolean rpmOkForSpeaker() {
         return up.getEncoder().getVelocity() <= -4800;
+    }
+
+    public boolean rpmOkForAmp() {
+        return up.getEncoder().getVelocity() <= -2400;
     }
 
     @Override

@@ -57,7 +57,7 @@ public class AngleSys extends SubsystemBase {
     }
 
     public void move(double val) {
-        if ((downLimit.get() && val < 0) || (upLimit.get() && val > 0)) {
+        if ((downLimit.get() && val < 0) || (upLimit.get() && SmartDashboard.getBoolean("IntakeAngle/AtBottom", false) && val > 0)) {
             final DutyCycleOut lRequest = new DutyCycleOut(-val * 1);
             leftMotor.setControl(lRequest);
         } else {

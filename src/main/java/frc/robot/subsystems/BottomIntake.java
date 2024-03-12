@@ -12,7 +12,7 @@ public class BottomIntake extends SubsystemBase {
     private CANSparkMax intakeU = new CANSparkMax(55, MotorType.kBrushless);
     private CANSparkMax intakeD = new CANSparkMax(56, MotorType.kBrushless);
 
-    private final Vision camera = new Vision("IntakeCam");
+    private final Vision camera = new Vision("IntakeCamera");
 
     public BottomIntake() {
         intakeD.follow(intakeU);
