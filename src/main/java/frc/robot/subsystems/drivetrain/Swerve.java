@@ -2,8 +2,6 @@ package frc.robot.subsystems.drivetrain;
 
 import frc.lib.util.LocalADStarAK;
 import frc.robot.Constants;
-import frc.robot.subsystems.MidIntake;
-import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Vision;
 import frc.robot.SwerveModule;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -17,7 +15,6 @@ import org.photonvision.EstimatedRobotPose;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
@@ -30,11 +27,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 public class Swerve extends SubsystemBase {
     private Vision s_Vision;
@@ -178,20 +171,7 @@ public class Swerve extends SubsystemBase {
             return (Math.PI + Math.atan((pose.getY() - Constants.GameObjects.RedAlliance.speaker.getY()) / 
                                 (pose.getX() - Constants.GameObjects.RedAlliance.speaker.getX())) + (Math.PI * 2)) % (Math.PI * 2);
     }
-
-    public Command getTrapCommand (int trapNum, Command riseToTrapAngle, Shooter shooter, MidIntake midIntake) {
-        return new ParallelDeadlineGroup(
-            new SequentialCommandGroup(
-                AutoBuilder.pathfindThenFollowPath(
-                    PathPlannerPath.fromPathFile("ToTrap" + trapNum), Constants.defaultPathConstraints),
-                new WaitUntilCommand(() -> riseToTrapAngle.isFinished()).withTimeout(2),
-                midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
-            ),
-            riseToTrapAngle.repeatedly(),
-            shooter.shootRepeatedly()
-        ).finallyDo(() -> midIntake.rawMove(0));
-    }
-
+    
     @Override
     public void periodic(){
         poseEstimator.update(getGyroYaw(), getModulePositions());

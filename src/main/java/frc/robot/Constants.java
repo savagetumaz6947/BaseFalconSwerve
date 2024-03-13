@@ -116,7 +116,7 @@ public final class Constants {
         /** Meters per Second */
         public static final double maxSpeed = 5.1;  // TODO: This must be tuned to specific robot / This is the theoretical maxSpeed of your robot (aka the 100% value)
                                                         //   You can ignore this value if "isOpenLoop" is set to FALSE
-        public static final double[] speedSelection = {1.3, 2.5, 4.5, 5.1}; //TODO: You can set this to your desired speed
+        public static final double[] speedSelection = {1.3, 3.0, 4.5}; //TODO: You can set this to your desired speed
         public static final double autonomousMaxSpeedSelection  = 4.5; // This refers to the index of the speedSelection defined on top by speedSelection[] used by Autonomous mode
 
         public static final double teleopMaxTranslateAcceleration = 15;

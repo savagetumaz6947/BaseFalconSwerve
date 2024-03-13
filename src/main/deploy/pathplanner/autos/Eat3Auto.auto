@@ -6,9 +6,22 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "DropIntake"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "DropIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ToMidFirstShootSpot"
+                }
+              }
+            ]
           }
         },
         {
@@ -68,19 +81,19 @@
           }
         },
         {
-          "type": "race",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "AmpToStageSuck"
-                }
-              },
               {
                 "type": "named",
                 "data": {
                   "name": "PickUpNote"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "AmpToStageSuck"
                 }
               }
             ]

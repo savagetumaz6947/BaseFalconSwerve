@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -15,14 +15,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeAngle extends SubsystemBase {
     private CANSparkMax motor = new CANSparkMax(58, MotorType.kBrushless);
-    private DoubleSupplier intakeAngle;
+    private BooleanSupplier intakeBottom;
     private DigitalInput upLimit = new DigitalInput(0);
     private DigitalInput downLimit = new DigitalInput(1);
 
-    public IntakeAngle (DoubleSupplier intakeAngleSupplier) {
+    public IntakeAngle (BooleanSupplier intakeBottomSupplier) {
         motor.setIdleMode(IdleMode.kBrake);
         motor.getEncoder().setPosition(0);
-        intakeAngle = intakeAngleSupplier;
+        intakeBottom = intakeBottomSupplier;
     }
 
     public void rawMove (double value) {
@@ -33,7 +33,7 @@ public class IntakeAngle extends SubsystemBase {
                 motor.set(0);
             }
         } else {
-            if (!upLimit.get() && intakeAngle.getAsDouble() < 31) {
+            if (!upLimit.get() && !intakeBottom.getAsBoolean()) {
                 motor.set(value);
             } else {
                 motor.set(0);
@@ -44,7 +44,7 @@ public class IntakeAngle extends SubsystemBase {
     public Command drop(AngleSys angleSys) {
         Command command = this.runOnce(() -> {
             rawMove(0.5);
-        }).repeatedly().withTimeout(2.5).finallyDo(() -> {
+        }).repeatedly().withTimeout(2).finallyDo(() -> {
             rawMove(0);
         });
         command.addRequirements(angleSys);

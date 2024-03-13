@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -20,10 +21,27 @@ public class Climber extends SubsystemBase {
         motorConfigs.NeutralMode = NeutralModeValue.Brake;
         leftConfig.apply(motorConfigs);
         rightConfig.apply(motorConfigs);
+
+        leftMotor.setPosition(0);
+        rightMotor.setPosition(0);
     }
 
-    public void move (DoubleSupplier left, DoubleSupplier right) {
-        leftMotor.set(left.getAsDouble());
-        rightMotor.set(right.getAsDouble());
+    public void move (DoubleSupplier left, DoubleSupplier right, BooleanSupplier force) {
+        if (force.getAsBoolean()) {
+            leftMotor.set(left.getAsDouble());
+            rightMotor.set(right.getAsDouble());
+        } else {
+            if (left.getAsDouble() < 0 && leftMotor.getPosition().getValueAsDouble() > 0) {
+                leftMotor.set(left.getAsDouble());
+            } else {
+                leftMotor.set(0);
+            }
+
+            if (right.getAsDouble() < 0 && rightMotor.getPosition().getValueAsDouble() > 0) {
+                rightMotor.set(right.getAsDouble());
+            } else {
+                rightMotor.set(0);
+            }
+        }
     }
 }

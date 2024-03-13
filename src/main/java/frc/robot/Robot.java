@@ -41,7 +41,35 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
-    Logger.recordMetadata("Project Name", "Savage Tumaz by Aaron"); // Set a metadata value
+    Logger.recordMetadata("Project Name", "Parasaur");
+    Logger.recordMetadata("Game", "2024 CRESCENDO");
+    Logger.recordMetadata("Regionals", "Sacramento & Central Valley");
+    Logger.recordMetadata("Captain/Lead Programmer/Operator", "Aaron Lee, Class of 2025");
+    Logger.recordMetadata("Mentor", "Hank Wei (肉包)");
+    Logger.recordMetadata("Head Designer", "Jessica Lin (JL), Class of 2025");
+    Logger.recordMetadata("Head Mechanic", "Cory Tseng, Class of 2025");
+    Logger.recordMetadata("Head PR/Business", "Cheryl Huang, Class of 2025");
+    Logger.recordMetadata("Strategy Manager", "Walter Hsieh, Class of 2025");
+    Logger.recordMetadata("Mechanic", "Mars Chung, Class of 2026");
+    Logger.recordMetadata("Mechanic", "Aaron Chen (Yi-Chia), Class of 2026");
+    Logger.recordMetadata("Driver", "Austin Wu, Class of 2025");
+    Logger.recordMetadata("Driver 2", "Evan Chen, Class of 2026");
+    Logger.recordMetadata("Factory Manager", "Alexander Lin, Class of 2025");
+    System.out.println( "                     ,% &&&%.&&&                  \r\n" + //
+                        "                     &&&&&&&&&&   .&&             \r\n" + //
+                        "                   &&&&&&&&&& %%   %%             \r\n" + //
+                        "                 &&& &&&&&%  (&&&&%               \r\n" + //
+                        "                &&&&& &&&&&  & &.                 \r\n" + //
+                        "               &&&&&&&&  &&&&&&&&     #           \r\n" + //
+                        "     .    (&%##&&&&&&&&&&   *  &&& .&## .         \r\n" + //
+                        "      %  .((((&&##%&&&&&&&&  &&&&&&##&,#& /       \r\n" + //
+                        "       &% ###%&#%##&#&&&&&&&&&&####&&##&(#        \r\n" + //
+                        "        ###(&&###*.&##&&%(&%#*&##&&&&&##*#        \r\n" + //
+                        "        &#& .(% ,##(&#%,(#%#&%#&*(&##&#(%         \r\n" + //
+                        "            *     #  ##%  ###### %(#* &           \r\n" + //
+                        "                  %  &    #&   %&                 \r\n" + //
+                        "");
+    System.out.println("  ######                                                                \n  #    #                                                                \n  #    #  #######  #######  #######  #######  #######  #     #  ####### \n#######  #     #  #     #  #     #  #        #     #  #     #  #     # \n##       #######  #######  #######  #######  #######  #     #  ####### \n##       #     #  #    #   #     #        #  #     #  #     #  #    #  \n##       #     #  #    ##  #     #  #######  #     #  #######  #    ## \n");
 
     if (isReal()) {
       try {

@@ -76,6 +76,7 @@ public class RobotContainer {
     private final Trigger maxSpeedUp = new Trigger(() -> driver.getPOV() == 0);
     private final Trigger maxSpeedDown = new Trigger(() -> driver.getPOV() == 180);
     private final Trigger autoAmpBtn = new Trigger(() -> driver.getPOV() == 270);
+    private final Trigger turboBtn = new Trigger(() -> driver.getRawAxis(XboxController.Axis.kLeftTrigger.value) > 0.8);
 
     /* Operator Controls */
     private final DoubleSupplier leftClimbAxis = () -> operator.getRawAxis(XboxController.Axis.kLeftY.value);
@@ -90,6 +91,7 @@ public class RobotContainer {
     private final JoystickButton resetAngleBtn = new JoystickButton(operator, XboxController.Button.kStart.value);
     private final JoystickButton compositeKillBtn = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
     private final JoystickButton manualPickupBtn = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
+    private final JoystickButton forceBtn = new JoystickButton(operator, XboxController.Button.kBack.value);
     private final Trigger trap1Btn = new Trigger(() -> {
         if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
             return operator.getRawButton(XboxController.Button.kX.value);
@@ -116,13 +118,13 @@ public class RobotContainer {
     private final Shooter shooter = new Shooter(swerve);
     private final AngleSys angleSys = new AngleSys();
     private final Climber climber = new Climber();
-    private final IntakeAngle intakeAngle = new IntakeAngle(angleSys::getAngle);
+    private final IntakeAngle intakeAngle = new IntakeAngle(angleSys::getDownLimit);
     private final LedStrip ledStrip = new LedStrip();
 
     private final RiseToAngle resetAngle = new RiseToAngle(() -> 30, angleSys);
-    private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 58.5, angleSys);
-    private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 61, angleSys);
-    private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 61, angleSys);
+    private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 49.5, angleSys);
+    private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 49.5, angleSys);
+    private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 49.5, angleSys);
     private final RiseToAngle riseToAmpAngle = new RiseToAngle(() -> 40.3, angleSys);
 
     /* Command Definitions */
@@ -200,7 +202,7 @@ public class RobotContainer {
         );
         shooter.setDefaultCommand(shooter.idle());
         angleSys.setDefaultCommand(resetAngle.repeatedly());
-        climber.setDefaultCommand(climber.run(() -> climber.move(leftClimbAxis, rightClimbAxis)));
+        climber.setDefaultCommand(climber.run(() -> climber.move(leftClimbAxis, rightClimbAxis, forceBtn)));
         intakeAngle.setDefaultCommand(intakeAngle.run(() -> intakeAngle.rawMove(bottomIntakeAxis.getAsDouble() * 0.5)));
 
         // Register named commands
@@ -236,6 +238,12 @@ public class RobotContainer {
         maxSpeedDown.onTrue(new InstantCommand(() ->
             maxSpeedMode = maxSpeedMode - 1 >= 0 ? maxSpeedMode - 1 : maxSpeedMode
         ));
+        turboBtn.onTrue(new InstantCommand(() -> {
+            maxSpeedMode = maxSpeedMode + 1 < Constants.Swerve.speedSelection.length ? maxSpeedMode + 1 : maxSpeedMode;
+        }));
+        turboBtn.onFalse(new InstantCommand(() -> {
+            maxSpeedMode = maxSpeedMode - 1 >= 0 ? maxSpeedMode - 1 : maxSpeedMode;
+        }));
 
         /* Operator Buttons */
         manualAngleUpBtn.whileTrue(angleSys.run(() -> angleSys.move(0.5)).repeatedly().finallyDo(() -> angleSys.move(0)));
@@ -249,7 +257,7 @@ public class RobotContainer {
             bottomIntake.rawMove(0);
             shooter.stop();
             angleSys.move(0);
-            climber.move(() -> 0, () -> 0);
+            climber.move(() -> 0, () -> 0, () -> true);
         }, swerve, midIntake, bottomIntake, shooter, angleSys, climber));
         manualPickupBtn.onTrue(pickUpNoteCommand);
         trap1Btn.onTrue(new ParallelDeadlineGroup(
@@ -288,7 +296,7 @@ public class RobotContainer {
         autoAmpBtn.onTrue(autoAmpCommand);
     }
 
-    /**
+    /** 
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
      * @return the command to run in autonomous

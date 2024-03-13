@@ -44,13 +44,17 @@ public class AngleSys extends SubsystemBase {
         return -encoder.getPosition() * 360 + 30;
     }
 
+    public boolean getDownLimit() {
+        return downLimit.get();
+    }
+
     /**
      * This function returns the automatically calculated angle in order for the shooter to be shot accurately into the speaker.
      * When it is not in range, it will return 34 degrees, the minimum angle available.
      * @return
      */
     public double getAutoAngle(double dist) {
-        double value = (71.3 - 12 * dist);
+        double value = (58.9 - 8.09 * dist);
         if (value < 29) return 29;
         else if (value > 60) return 60;
         return value; // Refer to Google Sheets
