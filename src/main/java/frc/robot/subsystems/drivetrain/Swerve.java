@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -36,6 +37,8 @@ public class Swerve extends SubsystemBase {
     public SwerveModule[] mSwerveMods;
     public AHRS navx;
 
+    public SlewRateLimiter[] rateLimiters;
+
     public Swerve() {
         navx = new AHRS(SPI.Port.kMXP);
 
@@ -44,6 +47,13 @@ public class Swerve extends SubsystemBase {
             new SwerveModule(1, Constants.Swerve.Mod1.constants),
             new SwerveModule(2, Constants.Swerve.Mod2.constants),
             new SwerveModule(3, Constants.Swerve.Mod3.constants)
+        };
+
+        rateLimiters = new SlewRateLimiter[] {
+            new SlewRateLimiter(Constants.Swerve.teleopMaxWheelAcceleration),
+            new SlewRateLimiter(Constants.Swerve.teleopMaxWheelAcceleration),
+            new SlewRateLimiter(Constants.Swerve.teleopMaxWheelAcceleration),
+            new SlewRateLimiter(Constants.Swerve.teleopMaxWheelAcceleration)
         };
 
         zeroGyro();
@@ -79,6 +89,10 @@ public class Swerve extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeedSelection);
 
         for (SwerveModule mod : mSwerveMods){
+            // Max Wheel Acceleration (only in Teleop)
+            if (DriverStation.isTeleopEnabled())
+                swerveModuleStates[mod.moduleNumber].speedMetersPerSecond =
+                    rateLimiters[mod.moduleNumber].calculate(swerveModuleStates[mod.moduleNumber].speedMetersPerSecond);
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber]);
         }
     }
