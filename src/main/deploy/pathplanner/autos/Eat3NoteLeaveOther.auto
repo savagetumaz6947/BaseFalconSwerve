@@ -10,16 +10,16 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "ToAmpFirstShootSpot"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "DropIntake"
                 }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ToMidFirstShootSpot"
+                }
               }
             ]
           }
@@ -37,7 +37,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ToAmpNote"
+                  "pathName": "ToMidNote"
                 }
               },
               {
@@ -62,7 +62,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ToNote1"
+                  "pathName": "MidToAmpSuck"
                 }
               },
               {
@@ -75,37 +75,25 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Note1ToAmpShoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ToAmpShootSpot"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Shoot"
           }
         },
         {
-          "type": "race",
+          "type": "deadline",
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "ToNote2"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "PickUpNote"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "AmpToStageSuck"
                 }
               }
             ]
@@ -114,19 +102,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Note2ToAmpShootSpot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ToAmpShootSpot"
+            "pathName": "ToStageAutoShootSpot"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeaveOtherDir"
           }
         }
       ]

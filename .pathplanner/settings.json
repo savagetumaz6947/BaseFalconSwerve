@@ -3,13 +3,14 @@
   "robotLength": 1.32,
   "holonomicMode": true,
   "pathFolders": [
-    "FirstShootSpot",
     "AutoBackToShootSpot",
+    "FirstShootSpot",
+    "Amp",
     "ShootSpot",
     "Trap"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 3.3,
+  "defaultMaxVel": 4.5,
   "defaultMaxAccel": 5.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,

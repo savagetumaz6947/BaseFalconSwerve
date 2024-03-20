@@ -4,7 +4,6 @@ import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -15,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -263,7 +263,7 @@ public class RobotContainer {
         trap1Btn.onTrue(new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 AutoBuilder.pathfindThenFollowPath(
-                    PathPlannerPath.fromPathFile("ToTrap1"), new PathConstraints(2.5, 5, Math.toRadians(420), Math.toRadians(720))),
+                    PathPlannerPath.fromPathFile("ToTrap1"), Constants.defaultPathConstraints),
                 new WaitUntilCommand(() -> riseToTrap1Angle.isFinished()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
@@ -273,7 +273,7 @@ public class RobotContainer {
         trap2Btn.onTrue(new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 AutoBuilder.pathfindThenFollowPath(
-                    PathPlannerPath.fromPathFile("ToTrap2"), new PathConstraints(2.5, 5, Math.toRadians(420), Math.toRadians(720))),
+                    PathPlannerPath.fromPathFile("ToTrap2"), Constants.defaultPathConstraints),
                 new WaitUntilCommand(() -> riseToTrap2Angle.isFinished()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
@@ -283,7 +283,7 @@ public class RobotContainer {
         trap3Btn.onTrue(new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 AutoBuilder.pathfindThenFollowPath(
-                    PathPlannerPath.fromPathFile("ToTrap3"), new PathConstraints(2.5, 5, Math.toRadians(420), Math.toRadians(720))),
+                    PathPlannerPath.fromPathFile("ToTrap3"), Constants.defaultPathConstraints),
                 new WaitUntilCommand(() -> riseToTrap3Angle.isFinished()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
@@ -291,9 +291,24 @@ public class RobotContainer {
             shooter.shootRepeatedly()
         ).finallyDo(() -> midIntake.rawMove(0)));
         // manualStartShooterBtn.onTrue(shooter.shootRepeatedly());
-        // manualStartShooterBtn.onTrue(intakeAngle.drop(angleSys)); // TODO: debug here
+        // manualStartShooterBtn.onTrue(intakeAngle.drop(angleSys));
         manualStartShooterBtn.whileTrue(shooter.run(() -> shooter.reverse()).andThen(shooter.idle()));
-        autoAmpBtn.onTrue(autoAmpCommand);
+        autoAmpBtn.onTrue(new SequentialCommandGroup(
+            new ConditionalCommand(
+                AutoBuilder.pathfindThenFollowPath(
+                    PathPlannerPath.fromPathFile("AmpFromAlliance"), Constants.defaultPathConstraints),
+                AutoBuilder.pathfindThenFollowPath(
+                    PathPlannerPath.fromPathFile("AmpFromMid"), Constants.defaultPathConstraints),
+                () -> {
+                    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+                        return swerve.getPose().getX() < 2.9;
+                    } else {
+                        return swerve.getPose().getX() > 13.67;
+                    }
+                }
+            ),
+            autoAmpCommand
+        ));
     }
 
     /** 
