@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.839641213724234,
-        "y": 7.004798511021523
+        "x": 3.8358359118159795,
+        "y": 7.091954253769181
       },
       "isLocked": false,
       "linkedName": "AmpShootSpot"
@@ -20,8 +20,8 @@
         "y": 7.44
       },
       "prevControl": {
-        "x": 3.3890532645930156,
-        "y": 7.414251945621009
+        "x": 3.406527693084217,
+        "y": 7.038123246924595
       },
       "nextControl": null,
       "isLocked": false,
