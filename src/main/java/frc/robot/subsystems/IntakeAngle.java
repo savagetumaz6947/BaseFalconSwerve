@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -53,9 +51,9 @@ public class IntakeAngle extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.recordOutput("IntakeAngle/EncoderPos", motor.getEncoder().getPosition());
-        Logger.recordOutput("IntakeAngle/DownLimit", downLimit.get());
-        Logger.recordOutput("IntakeAngle/UpLimit", upLimit.get());
+        // Logger.recordOutput("IntakeAngle/EncoderPos", motor.getEncoder().getPosition());
+        // Logger.recordOutput("IntakeAngle/DownLimit", downLimit.get());
+        // Logger.recordOutput("IntakeAngle/UpLimit", upLimit.get());
         SmartDashboard.putBoolean("IntakeAngle/AtBottom", downLimit.get());
     }
 }

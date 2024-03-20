@@ -10,7 +10,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
 import java.util.Optional;
 
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -21,6 +20,8 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -33,6 +34,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Swerve extends SubsystemBase {
     private Vision s_Vision;
     public SwerveDrivePoseEstimator poseEstimator;
+
+    private final Field2d field = new Field2d();
 
     public SwerveModule[] mSwerveMods;
     public AHRS navx;
@@ -70,13 +73,14 @@ public class Swerve extends SubsystemBase {
         Pathfinding.setPathfinder(new LocalADStarAK());
         PathPlannerLogging.setLogActivePathCallback(
             (activePath) -> {
-            Logger.recordOutput(
-                "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+            // Logger.recordOutput(
+            //     "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+                field.getObject("path").setPoses(activePath);
             });
-        PathPlannerLogging.setLogTargetPoseCallback(
-            (targetPose) -> {
-            Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
-            });
+        // PathPlannerLogging.setLogTargetPoseCallback(
+        //     (targetPose) -> {
+        //     Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+        //     });
     }
 
     /* Wrapper function that uses the Autonomous maxSpeedIndex for autonomous */
@@ -192,14 +196,18 @@ public class Swerve extends SubsystemBase {
 
         Optional<EstimatedRobotPose> visionPose = s_Vision.getEstimatedGlobalPose();
         if (visionPose.isPresent()) {
-            Logger.recordOutput("Odometry/Vision3d", visionPose.get().estimatedPose);
-            Logger.recordOutput("Odometry/Vision2d", visionPose.get().estimatedPose.toPose2d());
+            // Logger.recordOutput("Odometry/Vision3d", visionPose.get().estimatedPose);
+            // Logger.recordOutput("Odometry/Vision2d", visionPose.get().estimatedPose.toPose2d());
             poseEstimator.addVisionMeasurement(visionPose.get().estimatedPose.toPose2d(), visionPose.get().timestampSeconds);
         }
 
-        Logger.recordOutput("Odometry/Composite Pose", getPose());
-        Logger.recordOutput("Odometry/Module States", getModuleStates());
+        field.setRobotPose(getPose());
 
-        Logger.recordOutput("Odometry/Dist to Speaker", getDistToSpeaker());
+        SmartDashboard.putData("Field", field);
+
+        // Logger.recordOutput("Odometry/Composite Pose", getPose());
+        // Logger.recordOutput("Odometry/Module States", getModuleStates());
+
+        // Logger.recordOutput("Odometry/Dist to Speaker", getDistToSpeaker());
     }
 }

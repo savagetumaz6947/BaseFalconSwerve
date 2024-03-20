@@ -1,8 +1,5 @@
 package frc.robot.commands.Shooting;
 
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -36,7 +33,7 @@ public class AutoAimToShoot extends PIDCommand {
     @Override
     public void execute() {
         super.execute();
-        Logger.recordOutput("Commands/Shooting/AutoAimToShoot/Setpoint", getController().getSetpoint());
+        // Logger.recordOutput("Commands/Shooting/AutoAimToShoot/Setpoint", getController().getSetpoint());
         // SmartDashboard.putBoolean("AutoMoveToAngle OK?", isFinished());
     }
 }

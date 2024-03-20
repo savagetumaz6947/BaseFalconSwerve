@@ -6,7 +6,7 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "race",
           "data": {
             "commands": [
               {
@@ -84,6 +84,43 @@
           "type": "path",
           "data": {
             "pathName": "ToMidShootSpot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ToNote2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PickUpNote"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Note2ToAmpShootSpot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ToAmpShootSpot"
           }
         },
         {

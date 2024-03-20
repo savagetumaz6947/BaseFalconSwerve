@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -76,10 +74,10 @@ public class AngleSys extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.recordOutput("AngleSys/EncoderPos", encoder.getPosition());
-        Logger.recordOutput("AngleSys/EncoderAngleDeg", getAngle());
-        Logger.recordOutput("AngleSys/DownLimit", downLimit.get());
-        Logger.recordOutput("AngleSys/UpLimit", upLimit.get());
+        // Logger.recordOutput("AngleSys/EncoderPos", encoder.getPosition());
+        // Logger.recordOutput("AngleSys/EncoderAngleDeg", getAngle());
+        // Logger.recordOutput("AngleSys/DownLimit", downLimit.get());
+        // Logger.recordOutput("AngleSys/UpLimit", upLimit.get());
 
         SmartDashboard.putNumber("AngleSys/EncoderPos", encoder.getPosition());
         SmartDashboard.putNumber("AngleSys/EncoderAngleDeg", getAngle());

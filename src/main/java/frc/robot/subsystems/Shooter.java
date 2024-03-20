@@ -1,10 +1,9 @@
 package frc.robot.subsystems;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -42,7 +41,10 @@ public class Shooter extends SubsystemBase {
 
     public Command idle() {
         return new InstantCommand(() -> {
-            if (inRange()) {
+            if (DriverStation.isAutonomousEnabled()) {
+                up.set(-1);
+                down.set(1);
+            } else if (inRange()) {
                 up.set(-0.2);
                 down.set(0.2);
             } else {
@@ -85,8 +87,8 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.recordOutput("Shooter/UP_RPM",  up.getEncoder().getVelocity());
-        Logger.recordOutput("Shooter/DOWN_RPM",  up.getEncoder().getVelocity());
+        // Logger.recordOutput("Shooter/UP_RPM",  up.getEncoder().getVelocity());
+        // Logger.recordOutput("Shooter/DOWN_RPM",  up.getEncoder().getVelocity());
 
         SmartDashboard.putBoolean("Shooter In Range", inRange());
     }
