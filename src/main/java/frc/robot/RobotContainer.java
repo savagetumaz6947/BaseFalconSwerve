@@ -138,7 +138,7 @@ public class RobotContainer {
             bottomIntake.rawMove(0);
             midIntake.rawMove(0);
         });
-    private final Command autoGrabNoteCommand = new SequentialCommandGroup(
+    private final Command autoIntakeCommand = new SequentialCommandGroup(
             new AutoAimNote(swerve, bottomIntake.getCamera()),
             new ParallelDeadlineGroup(
                 /* PICK UP NOTE COMMAND */
@@ -226,7 +226,7 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         driverCancelSwerveBtn.onTrue(swerve.runOnce(() -> swerve.driveChassis(new ChassisSpeeds())));
-        autoPickupButton.onTrue(autoGrabNoteCommand);
+        autoPickupButton.onTrue(autoIntakeCommand);
         autoShootButton.onTrue(autoShootCommand);
         autoDriveToAmpPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToAmpShootSpot"), Constants.defaultPathConstraints));
         autoDriveToMidPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToMidShootSpot"), Constants.defaultPathConstraints));
