@@ -29,8 +29,8 @@ public class Shooter extends SubsystemBase {
 
     public Command shootRepeatedlyForAmp() {
         return this.runEnd(() -> {
-            up.set(-0.5);
-            down.set(.5);
+            up.set(-0.7);
+            down.set(.7);
         }, () -> up.set(0));
     }
     // Amp 40.3 DEG
@@ -41,7 +41,7 @@ public class Shooter extends SubsystemBase {
 
     public Command idle() {
         return new InstantCommand(() -> {
-            if (DriverStation.isAutonomousEnabled()) {
+            if (DriverStation.isAutonomous()) {
                 up.set(-1);
                 down.set(1);
             } else if (inRange()) {

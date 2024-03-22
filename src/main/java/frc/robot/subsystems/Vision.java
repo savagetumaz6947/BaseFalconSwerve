@@ -10,6 +10,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
@@ -44,7 +45,7 @@ public class Vision {
     public Vision(String cameraName, Transform3d robotToCam, AprilTagFieldLayout aprilTagFieldLayout) {
         camera = new PhotonCamera(cameraName);
         photonEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, robotToCam);
-        photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_LAST_POSE);
+        // photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_LAST_POSE);
     }
 
     /**
@@ -57,6 +58,10 @@ public class Vision {
 
     public PhotonTrackedTarget getBestTarget() {
         return camera.getLatestResult().getBestTarget();
+    }
+
+    public void setLastPose(Pose2d pose) {
+        photonEstimator.setLastPose(pose);
     }
 
     /**

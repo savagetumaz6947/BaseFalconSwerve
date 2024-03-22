@@ -9,7 +9,7 @@ import frc.robot.subsystems.drivetrain.Swerve;
 
 public class AutoAimToShoot extends PIDCommand {
     public AutoAimToShoot(Swerve swerve) {
-        super(new PIDController(10, 0, 1.0),
+        super(new PIDController(8, .5, 1.0),
             () -> {
                 if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
                     return swerve.getPose().getRotation().getDegrees();

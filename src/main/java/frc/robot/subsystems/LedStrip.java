@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LedStrip extends SubsystemBase {
-    private AddressableLED led = new AddressableLED(1);
+    private AddressableLED led = new AddressableLED(9);
     private AddressableLEDBuffer buffer = new AddressableLEDBuffer(62);
     private int position = 7;
 

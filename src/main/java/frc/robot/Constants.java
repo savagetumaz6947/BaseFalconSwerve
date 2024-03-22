@@ -121,7 +121,7 @@ public final class Constants {
 
         public static final double teleopMaxWheelAcceleration = 15;
         /** Radians per Second */
-        public static final double maxAngularVelocity = Units.degreesToRadians(540); //TODO: This must be tuned to specific robot
+        public static final double maxAngularVelocity = Units.degreesToRadians(360); //TODO: This must be tuned to specific robot
 
         public static final double teleopMaxAngularAcceleration = Units.degreesToRadians(720);
 

@@ -81,6 +81,8 @@ public class Swerve extends SubsystemBase {
         //     (targetPose) -> {
         //     Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         //     });
+
+        // s_Vision.setLastPose(getPose());
     }
 
     /* Wrapper function that uses the Autonomous maxSpeedIndex for autonomous */
@@ -94,7 +96,7 @@ public class Swerve extends SubsystemBase {
 
         for (SwerveModule mod : mSwerveMods){
             // Max Wheel Acceleration (only in Teleop)
-            if (DriverStation.isTeleopEnabled())
+            if (DriverStation.isTeleop())
                 swerveModuleStates[mod.moduleNumber].speedMetersPerSecond =
                     rateLimiters[mod.moduleNumber].calculate(swerveModuleStates[mod.moduleNumber].speedMetersPerSecond);
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber]);
@@ -202,6 +204,7 @@ public class Swerve extends SubsystemBase {
         }
 
         field.setRobotPose(getPose());
+        // s_Vision.setLastPose(getPose());
 
         SmartDashboard.putData("Field", field);
 

@@ -35,13 +35,13 @@ public class Climber extends SubsystemBase {
             leftMotor.set(left.getAsDouble());
             rightMotor.set(right.getAsDouble());
         } else {
-            if ((left.getAsDouble() < 0 && leftMotor.getPosition().getValueAsDouble() > -360) || (left.getAsDouble() > 0 && leftMotor.getPosition().getValueAsDouble() < 0)) {
+            if ((left.getAsDouble() < 0 && leftMotor.getPosition().getValueAsDouble() > -180) || (left.getAsDouble() > 0 && leftMotor.getPosition().getValueAsDouble() < 0)) {
                 leftMotor.set(left.getAsDouble());
             } else {
                 leftMotor.set(0);
             }
 
-            if ((right.getAsDouble() < 0 && rightMotor.getPosition().getValueAsDouble() > -385.886) || (right.getAsDouble() > 0 && rightMotor.getPosition().getValueAsDouble() < 0)) {
+            if ((right.getAsDouble() < 0 && rightMotor.getPosition().getValueAsDouble() > -180) || (right.getAsDouble() > 0 && rightMotor.getPosition().getValueAsDouble() < 0)) {
                 rightMotor.set(right.getAsDouble());
             } else {
                 rightMotor.set(0);

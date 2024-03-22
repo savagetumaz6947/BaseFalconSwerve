@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -77,6 +76,7 @@ public class RobotContainer {
     private final Trigger maxSpeedDown = new Trigger(() -> driver.getPOV() == 180);
     private final Trigger autoAmpBtn = new Trigger(() -> driver.getPOV() == 270);
     private final Trigger turboBtn = new Trigger(() -> driver.getRawAxis(XboxController.Axis.kLeftTrigger.value) > 0.8);
+    private final Trigger passBallBtn = new Trigger(() -> driver.getPOV() == 90);
 
     /* Operator Controls */
     private final DoubleSupplier leftClimbAxis = () -> operator.getRawAxis(XboxController.Axis.kLeftY.value);
@@ -125,7 +125,8 @@ public class RobotContainer {
     private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 49.5, angleSys);
     private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 49.5, angleSys);
     private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 49.5, angleSys);
-    private final RiseToAngle riseToAmpAngle = new RiseToAngle(() -> 40.3, angleSys);
+    private final RiseToAngle riseToPassAngle = new RiseToAngle(() -> 49.5, angleSys);
+    private final RiseToAngle riseToAmpAngle = new RiseToAngle(() -> 42, angleSys);
 
     /* Command Definitions */
     private final AutoAimToShoot autoAimToShootCommand = new AutoAimToShoot(swerve);
@@ -160,7 +161,7 @@ public class RobotContainer {
                 new WaitUntilCommand(() -> shooter.rpmOkForAmp()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
-            riseToAmpAngle.repeatedly(),
+            riseToAmpAngle,
             shooter.shootRepeatedlyForAmp(),
             new InstantCommand(() -> ledStrip.shoot(true))
         ).finallyDo(() -> {
@@ -175,8 +176,8 @@ public class RobotContainer {
                 new WaitUntilCommand(() -> autoAimToShootCommand.isFinished()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
-            autoAimToShootCommand.repeatedly(),
-            autoRiseToAngleCommand.repeatedly(),
+            autoAimToShootCommand.andThen(swerve.run(() -> swerve.driveChassis(new ChassisSpeeds(0,0,0)))),
+            autoRiseToAngleCommand,
             shooter.shootRepeatedly(),
             new InstantCommand(() -> ledStrip.shoot(true))
         ).finallyDo(() -> {
@@ -225,8 +226,15 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
-        driverCancelSwerveBtn.onTrue(swerve.runOnce(() -> swerve.driveChassis(new ChassisSpeeds())));
-        autoPickupButton.onTrue(autoIntakeCommand);
+        driverCancelSwerveBtn.onTrue(new InstantCommand(() -> {
+            swerve.driveChassis(new ChassisSpeeds());
+            midIntake.rawMove(0);
+            bottomIntake.rawMove(0);
+            shooter.stop();
+            angleSys.move(0);
+            climber.move(() -> 0, () -> 0, () -> true);
+        }, swerve, midIntake, bottomIntake, shooter, angleSys, climber));
+        autoPickupButton.whileTrue(pickUpNoteCommand);
         autoShootButton.onTrue(autoShootCommand);
         autoDriveToAmpPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToAmpShootSpot"), Constants.defaultPathConstraints));
         autoDriveToMidPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToMidShootSpot"), Constants.defaultPathConstraints));
@@ -244,12 +252,26 @@ public class RobotContainer {
         turboBtn.onFalse(new InstantCommand(() -> {
             maxSpeedMode = maxSpeedMode - 1 >= 0 ? maxSpeedMode - 1 : maxSpeedMode;
         }));
+        passBallBtn.onTrue(new ParallelDeadlineGroup(
+            new SequentialCommandGroup(
+                new WaitUntilCommand(() -> riseToPassAngle.isFinished()).withTimeout(2),
+                new WaitUntilCommand(() -> shooter.rpmOkForSpeaker()).withTimeout(2),
+                midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
+            ),
+            riseToPassAngle,
+            shooter.shootRepeatedly(),
+            new InstantCommand(() -> ledStrip.shoot(true))
+        ).finallyDo(() -> {
+            shooter.idle();
+            midIntake.rawMove(0);
+            ledStrip.shoot(false);
+        }));
 
         /* Operator Buttons */
         manualAngleUpBtn.whileTrue(angleSys.run(() -> angleSys.move(0.5)).repeatedly().finallyDo(() -> angleSys.move(0)));
         manualAngleDownBtn.whileTrue(angleSys.run(() -> angleSys.move(-0.5)).repeatedly().finallyDo(() -> angleSys.move(0)));
-        manualMidIntakeUpBtn.whileTrue(midIntake.run(() -> midIntake.rawMove(-0.7)).repeatedly().finallyDo(() -> midIntake.rawMove(0)));
-        manualMidIntakeDownBtn.whileTrue(midIntake.run(() -> midIntake.rawMove(0.7)).repeatedly().finallyDo(() -> midIntake.rawMove(0)));
+        manualMidIntakeUpBtn.whileTrue(midIntake.run(() -> midIntake.rawMove(-1)).repeatedly().finallyDo(() -> midIntake.rawMove(0)));
+        manualMidIntakeDownBtn.whileTrue(midIntake.run(() -> midIntake.rawMove(1)).repeatedly().finallyDo(() -> midIntake.rawMove(0)));
         resetAngleBtn.onTrue(new InstantCommand(() -> angleSys.reset()));
         compositeKillBtn.whileTrue(new InstantCommand(() -> {
             swerve.driveChassis(new ChassisSpeeds());
@@ -259,7 +281,7 @@ public class RobotContainer {
             angleSys.move(0);
             climber.move(() -> 0, () -> 0, () -> true);
         }, swerve, midIntake, bottomIntake, shooter, angleSys, climber));
-        manualPickupBtn.onTrue(pickUpNoteCommand);
+        manualPickupBtn.onTrue(autoIntakeCommand);
         trap1Btn.onTrue(new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 AutoBuilder.pathfindThenFollowPath(
@@ -267,7 +289,7 @@ public class RobotContainer {
                 new WaitUntilCommand(() -> riseToTrap1Angle.isFinished()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
-            riseToTrap1Angle.repeatedly(),
+            riseToTrap1Angle,
             shooter.shootRepeatedly()
         ).finallyDo(() -> midIntake.rawMove(0)));
         trap2Btn.onTrue(new ParallelDeadlineGroup(
@@ -277,7 +299,7 @@ public class RobotContainer {
                 new WaitUntilCommand(() -> riseToTrap2Angle.isFinished()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
-            riseToTrap2Angle.repeatedly(),
+            riseToTrap2Angle,
             shooter.shootRepeatedly()
         ).finallyDo(() -> midIntake.rawMove(0)));
         trap3Btn.onTrue(new ParallelDeadlineGroup(
@@ -287,28 +309,11 @@ public class RobotContainer {
                 new WaitUntilCommand(() -> riseToTrap3Angle.isFinished()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
-            riseToTrap3Angle.repeatedly(),
+            riseToTrap3Angle,
             shooter.shootRepeatedly()
         ).finallyDo(() -> midIntake.rawMove(0)));
-        // manualStartShooterBtn.onTrue(shooter.shootRepeatedly());
-        // manualStartShooterBtn.onTrue(intakeAngle.drop(angleSys));
         manualStartShooterBtn.whileTrue(shooter.run(() -> shooter.reverse()).andThen(shooter.idle()));
-        autoAmpBtn.onTrue(new SequentialCommandGroup(
-            new ConditionalCommand(
-                AutoBuilder.pathfindThenFollowPath(
-                    PathPlannerPath.fromPathFile("AmpFromAlliance"), Constants.defaultPathConstraints),
-                AutoBuilder.pathfindThenFollowPath(
-                    PathPlannerPath.fromPathFile("AmpFromMid"), Constants.defaultPathConstraints),
-                () -> {
-                    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
-                        return swerve.getPose().getX() < 2.9;
-                    } else {
-                        return swerve.getPose().getX() > 13.67;
-                    }
-                }
-            ),
-            autoAmpCommand
-        ));
+        autoAmpBtn.onTrue(autoAmpCommand);
     }
 
     /** 
