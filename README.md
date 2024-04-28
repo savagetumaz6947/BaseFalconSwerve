@@ -2,8 +2,7 @@
 
 This is the code repository for *Parasaur*, the FRC robot developed by Team 6947 Savage Tumaz for the 2023-2024 CRESCENDO Season. Parasaur competed in both the [Sacramento](https://www.thebluealliance.com/event/2024cada) (Rank 9, Alliance 4 First Pick) and [Central Valley](https://www.thebluealliance.com/event/2024cafr) (Rank 8, Alliance 4 First Pick) Regionals. We were honored to receive the Autonomous Award at the Sacramento Regional, and our team captain and head programmer, Aaron Lee, was named a Dean's List Award Finalist at the Central Valley Regional.
 
-> In the crucible of competition, where the line between the autonomous period and teleop becomes a frontier for innovation, one team stands out by extending autonomous brilliance into the realm of teleoperation. Utilizing a sophisticated vision system, it not only localizes to its surroundings but hunts down Notes with the precision of a savage predator. Through the clever application of A-star and D-star algorithms, it seamlessly navigates the terrian plotting direct courses to the goals set by the drivers. - Central Valley Regional
-
+> In the crucible of competition, where the line between the autonomous period and teleop becomes a frontier for innovation, one team stands out by extending autonomous brilliance into the realm of teleoperation. Utilizing a sophisticated vision system, it not only localizes to its surroundings but hunts down Notes with the precision of a savage predator. Through the clever application of A-star and D-star algorithms, it seamlessly navigates the terrain plotting direct courses to the goals set by the drivers. - Central Valley Regional
 
 [Full Engineering Notebook](.github/docs/engineering-notebook.pdf)
 
@@ -18,7 +17,7 @@ This is the code repository for *Parasaur*, the FRC robot developed by Team 6947
 - **Phoenix6 Integration**: Utilizing Velocity and DutyCycle controls for motors.
 - **MK4i Swerve Field-Oriented Drivetrain**: Equipped with Falcon 500 motors, CANcoders, and NavX for precise control.
 - **Set Shooter Angle**: Adjustable to any angle for accurate targeting.
-- **AutoRise and AutoAim**: Automated mechanisms for speaker and note pickup.
+- **AutoRise and AutoAim**: Automated speaker and note pickup mechanisms.
 
 ### Autonomous Routines
 
@@ -53,7 +52,7 @@ This is the code repository for *Parasaur*, the FRC robot developed by Team 6947
 
 |Subsystem|Type|Name|CAN Bus|CAN ID|Note|
 |--|--|--|--|--|--|
-|AngleSys|Spark MAX|Encoder|rio|43|no motor, only used as controller for the SRX Mag Encoder|
+|AngleSys|Spark MAX|Encoder|rio|43|no motor, only used as a controller for the SRX Mag Encoder|
 
 |Subsystem|Type|Name|Header|Note|
 |--|--|--|--|--|
@@ -92,20 +91,31 @@ Employs a WS2812B addressable LED strip with 62 LEDs (31 on each side), connecte
 
 ### Team Members
 
-- **Captain/Lead Programmer/Operator:** Aaron Lee, Class of 2025
+- **Captain/Lead Programmer:** Aaron Lee, Class of 2025
 - **Technical Mentor:** Hank Wei (Meat Bun)
 - **Mentor:** Dorcas Juan
-- **Vice Captain/Head Designer:** Jessica Lin (JL), Class of 2025
-- **Head Mechanic:** Cory Tseng, Class of 2025
-- **Vice Captain/Head PR/Business:** Cheryl Huang, Class of 2025
+- **Engineering Vice Captain/Chief Designer:** Jessica Lin (JL), Class of 2025
+- **Chief Mechanical Engineer:** Cory Tseng, Class of 2025
+- **PR and Business Vice Captain:** Cheryl Huang, Class of 2025
+- **Chief Business Officer:** Hiro Lu, Class of 2025
 - **Strategy Manager:** Walter Hsieh, Class of 2025
-- **Mechanic:** Mars Chung, Class of 2026
 - **Deputy Captain/Mechanic:** Aaron Chen (Yi-Chia), Class of 2026
-- **Driver:** Austin Wu, Class of 2025
-- **Driver 2:** Evan Chen, Class of 2026
+- **Mechanic:** Mars Chung, Class of 2026
+- **Human Resources Manager:** Austin Wu, Class of 2025
 - **Factory Manager:** Alexander Lin, Class of 2025
+- **General Affairs:** Raymond Yeh, Class of 2025
 
-To all members of our team and everyone that helped us along the way, whether mentioned here or not: we extend our heartfelt thanks for your contributions and dedication.
+### Drive Team
 
-*- Aaron Lee*  
+- **Drive Coach:** Hank Wei (Meat Bun)
+- **Driver:** Austin Wu, Class of 2025
+- **Operator:** Aaron Lee, Class of 2025
+- **Driver 2:** Evan Chen, Class of 2026
+- **Human Player/Technician:** Cory Tseng, Class of 2025
+- **Human Player/Technician:** Mars Chung, Class of 2026
+
+To all members of our team and everyone who helped us along the way, whether mentioned here or not: we extend our heartfelt thanks for your contributions and dedication.
+
+*- Aaron Lee*<br />
+*Team Captain*<br />
 *April 28, 2024*
