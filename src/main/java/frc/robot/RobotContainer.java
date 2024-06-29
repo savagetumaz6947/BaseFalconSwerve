@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -21,12 +22,12 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.drivetrain.Swerve;
 import frc.lib.util.DeadzoneJoystick;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.Angle.AutoRiseToAngle;
 import frc.robot.commands.Angle.RiseToAngle;
-import frc.robot.commands.Intake.AutoAimNote;
 import frc.robot.commands.Shooting.AutoAimToShoot;
 import frc.robot.subsystems.AngleSys;
 import frc.robot.subsystems.BottomIntake;
@@ -52,7 +53,7 @@ public class RobotContainer {
     private final DoubleSupplier rotationAxis = () -> -driver.getRawAxis(XboxController.Axis.kRightX.value);
 
     /* Driver Buttons */
-    private final Trigger autoPickupButton = new Trigger(() -> driver.getRawAxis(XboxController.Axis.kRightTrigger.value) > 0.8);
+    private final Trigger toggleAssistedIntake = new Trigger(() -> driver.getRawAxis(XboxController.Axis.kRightTrigger.value) > 0.8);
     private final JoystickButton autoShootButton = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
     private final Trigger autoDriveToAmpPosBtn = new Trigger(() -> {
         if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
@@ -110,16 +111,21 @@ public class RobotContainer {
     private final JoystickButton manualStartShooterBtn = new JoystickButton(operator, XboxController.Button.kA.value);
 
     private int maxSpeedMode = 1;
+    private boolean enableAssistedIntake = false;
 
     /* Subsystems */
+    private final Vision intakeCamera = new Vision("IntakeCamera");
+
+    public final BooleanSupplier isAssistedIntaking = () -> enableAssistedIntake && intakeCamera.hasTargets();
+
     private final Swerve swerve = new Swerve();
-    private final MidIntake midIntake = new MidIntake();
-    private final BottomIntake bottomIntake = new BottomIntake();
+    private final MidIntake midIntake = new MidIntake(isAssistedIntaking);
+    private final BottomIntake bottomIntake = new BottomIntake(intakeCamera, isAssistedIntaking);
     private final Shooter shooter = new Shooter(swerve);
     private final AngleSys angleSys = new AngleSys();
     private final Climber climber = new Climber();
     private final IntakeAngle intakeAngle = new IntakeAngle(angleSys::getDownLimit);
-    private final LedStrip ledStrip = new LedStrip();
+    private final LedStrip ledStrip = new LedStrip(isAssistedIntaking);
 
     private final RiseToAngle resetAngle = new RiseToAngle(() -> 30, angleSys);
     private final RiseToAngle riseToTrap1Angle = new RiseToAngle(() -> 49.5, angleSys);
@@ -131,30 +137,14 @@ public class RobotContainer {
     /* Command Definitions */
     private final AutoAimToShoot autoAimToShootCommand = new AutoAimToShoot(swerve);
     private final AutoRiseToAngle autoRiseToAngleCommand = new AutoRiseToAngle(angleSys, swerve);
+    public final Command pickUpNoteCommand = new InstantCommand(() -> {
+        midIntake.rawMove(-1);
+        bottomIntake.rawMove(0.5);
+    }, midIntake, bottomIntake).repeatedly().until(() -> midIntake.hasNote()).finallyDo(() -> {
+        bottomIntake.rawMove(0);
+        midIntake.rawMove(0);
+    });
 
-    private final Command pickUpNoteCommand = new InstantCommand(() -> {
-            midIntake.rawMove(-1);
-            bottomIntake.rawMove(0.5);
-        }, midIntake, bottomIntake).repeatedly().until(() -> midIntake.hasNote()).finallyDo(() -> {
-            bottomIntake.rawMove(0);
-            midIntake.rawMove(0);
-        });
-    private final Command autoIntakeCommand = new SequentialCommandGroup(
-            new AutoAimNote(swerve, bottomIntake.getCamera()),
-            new ParallelDeadlineGroup(
-                /* PICK UP NOTE COMMAND */
-                new InstantCommand(() -> {
-                    midIntake.rawMove(-1);
-                    bottomIntake.rawMove(0.5);
-                }, midIntake, bottomIntake).repeatedly().until(() -> midIntake.hasNote()).finallyDo(() -> {
-                    bottomIntake.rawMove(0);
-                    midIntake.rawMove(0);
-                })
-                /* PICK UP NOTE COMMAND END */,
-                swerve.run(() -> swerve.driveChassis(new ChassisSpeeds(1.5, 0, 0)))
-            ),
-            swerve.runOnce(() -> swerve.driveChassis(new ChassisSpeeds(0, 0, 0)))
-        );
     private final Command autoAmpCommand =  new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> riseToAmpAngle.isFinished()).withTimeout(2),
@@ -194,17 +184,22 @@ public class RobotContainer {
         swerve.setDefaultCommand(
             new TeleopSwerve(
                 swerve,
+                midIntake,
+                intakeCamera,
                 translationAxis,
                 strafeAxis,
                 rotationAxis,
                 () -> !fodButton.getAsBoolean(),
-                () -> maxSpeedMode
+                () -> maxSpeedMode,
+                () -> enableAssistedIntake
             )
         );
         shooter.setDefaultCommand(shooter.idle());
         angleSys.setDefaultCommand(resetAngle.repeatedly());
         climber.setDefaultCommand(climber.run(() -> climber.move(leftClimbAxis, rightClimbAxis, forceBtn)));
         intakeAngle.setDefaultCommand(intakeAngle.run(() -> intakeAngle.rawMove(bottomIntakeAxis.getAsDouble() * 0.5)));
+        midIntake.setDefaultCommand(midIntake.assistedIntake());
+        bottomIntake.setDefaultCommand(bottomIntake.assistedIntake());
 
         // Register named commands
         NamedCommands.registerCommand("PickUpNote", pickUpNoteCommand);
@@ -234,7 +229,7 @@ public class RobotContainer {
             angleSys.move(0);
             climber.move(() -> 0, () -> 0, () -> true);
         }, swerve, midIntake, bottomIntake, shooter, angleSys, climber));
-        autoPickupButton.whileTrue(pickUpNoteCommand);
+        toggleAssistedIntake.onTrue(new InstantCommand(() -> enableAssistedIntake = !enableAssistedIntake));
         autoShootButton.onTrue(autoShootCommand);
         autoDriveToAmpPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToAmpShootSpot"), Constants.defaultPathConstraints));
         autoDriveToMidPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToMidShootSpot"), Constants.defaultPathConstraints));
@@ -281,7 +276,7 @@ public class RobotContainer {
             angleSys.move(0);
             climber.move(() -> 0, () -> 0, () -> true);
         }, swerve, midIntake, bottomIntake, shooter, angleSys, climber));
-        manualPickupBtn.onTrue(autoIntakeCommand);
+        manualPickupBtn.onTrue(pickUpNoteCommand);
         trap1Btn.onTrue(new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 AutoBuilder.pathfindThenFollowPath(

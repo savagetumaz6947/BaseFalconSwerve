@@ -1,6 +1,5 @@
 package frc.robot.subsystems.drivetrain;
 
-import frc.lib.util.LocalADStarAK;
 import frc.robot.Constants;
 import frc.robot.subsystems.Vision;
 import frc.robot.SwerveModule;
@@ -14,6 +13,7 @@ import org.photonvision.EstimatedRobotPose;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
@@ -70,7 +70,7 @@ public class Swerve extends SubsystemBase {
                                         Constants.autoConstants,
                                         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                                         this);
-        Pathfinding.setPathfinder(new LocalADStarAK());
+        Pathfinding.setPathfinder(new LocalADStar());
         PathPlannerLogging.setLogActivePathCallback(
             (activePath) -> {
             // Logger.recordOutput(
@@ -104,15 +104,19 @@ public class Swerve extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, double maxSpeedSelection) {
+        drive(translation, rotation, fieldRelative, maxSpeedSelection, new ChassisSpeeds());
+    }
+
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, double maxSpeedSelection, ChassisSpeeds offsetChassisSpeeds) {
         driveChassis(fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         translation.getX(),
                         translation.getY(),
                         rotation,
-                        getHeading())
+                        getHeading()).plus(offsetChassisSpeeds)
                       : new ChassisSpeeds(
                           translation.getX(),
                           translation.getY(),
-                          rotation),
+                          rotation).plus(offsetChassisSpeeds),
                     maxSpeedSelection);
     }
 

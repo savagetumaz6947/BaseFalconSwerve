@@ -19,6 +19,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
@@ -102,26 +104,25 @@ public final class Constants {
         public static final double angleKD = chosenModule.angleKD;
 
         /* Drive Motor PID Values */
-        public static final double driveKP = 0.13; //TODO: This must be tuned to specific robot
+        public static final double driveKP = 0.13;
         public static final double driveKI = 0.0;
         public static final double driveKD = 0.075;
         public static final double driveKF = 0.0;
 
         /* Drive Motor Characterization Values */
-        public static final double driveKS = 0.32; //TODO: This must be tuned to specific robot
+        public static final double driveKS = 0.32;
         public static final double driveKV = 1.51;
         public static final double driveKA = 0.27;
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 5.1;  // TODO: This must be tuned to specific robot / This is the theoretical maxSpeed of your robot (aka the 100% value)
-                                                        //   You can ignore this value if "isOpenLoop" is set to FALSE
-        public static final double[] speedSelection = {3.0, 4.5, 5.5}; //TODO: You can set this to your desired speed
-        public static final double autonomousMaxSpeedSelection  = 4.5; // This refers to the index of the speedSelection defined on top by speedSelection[] used by Autonomous mode
+        public static final double maxSpeed = 5.1;
+        public static final double[] speedSelection = {3.0, 4.5, 5.5}; // You can set this to your desired speed
+        public static final double autonomousMaxSpeedSelection  = 4.5;
 
         public static final double teleopMaxWheelAcceleration = 15;
         /** Radians per Second */
-        public static final double maxAngularVelocity = Units.degreesToRadians(360); //TODO: This must be tuned to specific robot
+        public static final double maxAngularVelocity = Units.degreesToRadians(360);
 
         public static final double teleopMaxAngularAcceleration = Units.degreesToRadians(720);
 
@@ -183,4 +184,6 @@ public final class Constants {
     );
 
     public static final PathConstraints defaultPathConstraints = new PathConstraints(4.5, 5, Math.toRadians(420), Math.toRadians(720));
+
+    public static final ShuffleboardTab DEBUG_TAB = Shuffleboard.getTab("Debug");
 }
