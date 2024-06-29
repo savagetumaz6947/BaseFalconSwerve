@@ -4,12 +4,12 @@
 
 package frc.robot;
 
-import org.littletonrobotics.junction.LoggedRobot;
 // import org.littletonrobotics.junction.Logger;
 // import org.littletonrobotics.junction.networktables.NT4Publisher;
 // import org.littletonrobotics.junction.wpilog.WPILOGReader;
 // import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.wpilibj.TimedRobot;
 // import edu.wpi.first.wpilibj.PowerDistribution;
 // import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends LoggedRobot {
+public class Robot extends TimedRobot {
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
 
   private Command m_autonomousCommand;
