@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,10 +14,12 @@ public class LedStrip extends SubsystemBase {
     private AddressableLED led = new AddressableLED(9);
     private AddressableLEDBuffer buffer = new AddressableLEDBuffer(62);
     private int position = 7;
+    private boolean flashState = false;
 
     private boolean shooting = false;
+    private BooleanSupplier isAssistedIntaking;
 
-    public LedStrip () {
+    public LedStrip (BooleanSupplier isAssistedIntaking) {
         led.setLength(buffer.getLength());
         for (int i = 0; i < 7; i++) {
             buffer.setLED(i, Color.kWhite);
@@ -23,6 +27,8 @@ public class LedStrip extends SubsystemBase {
         }
         led.setData(buffer);
         led.start();
+
+        this.isAssistedIntaking = isAssistedIntaking;
     }
 
     @Override
@@ -42,6 +48,38 @@ public class LedStrip extends SubsystemBase {
                 buffer.setLED(i, Color.kOrange);
             }
             position = 7;
+            led.setData(buffer);
+            return;
+        }
+
+        if (isAssistedIntaking.getAsBoolean()) {
+            double offset = SmartDashboard.getNumber("Assisted Intake Offset", 1);
+            // if positive, flash orange on the right and black on the left
+            // if negative, flash orange on the left and black on the right
+            // if zero, flash orange on the left and right
+            if (flashState) {
+                if (offset > 0) {
+                    for (int i = 0; i < 32; i++) {
+                        buffer.setLED(i, Color.kOrange);
+                        buffer.setLED(61 - i, Color.kBlack);
+                    }
+                } else if (offset < 0) {
+                    for (int i = 0; i < 32; i++) {
+                        buffer.setLED(i, Color.kBlack);
+                        buffer.setLED(61 - i, Color.kOrange);
+                    }
+                } else {
+                    for (int i = 0; i < 32; i++) {
+                        buffer.setLED(i, Color.kOrange);
+                        buffer.setLED(61 - i, Color.kOrange);
+                    }
+                }
+            } else {
+                for (int i = 0; i < buffer.getLength(); i++) {
+                    buffer.setLED(i, Color.kBlack);
+                }
+            }
+            flashState = !flashState;
             led.setData(buffer);
             return;
         }
