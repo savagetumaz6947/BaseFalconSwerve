@@ -40,11 +40,14 @@ public class MidIntake extends SubsystemBase {
     }
 
     public Command assistedIntake() {
-        // FIXME: possible failure point here
+        // XXX: possible failure point here
         return new ConditionalCommand(
-            this.run(() -> rawMove(-1)).repeatedly().withTimeout(3),
             this.run(() -> rawMove(0)),
-            () -> isAssistedIntaking.getAsBoolean() && !hasNote()).repeatedly();
+            new ConditionalCommand(
+                this.run(() -> rawMove(-1)).repeatedly().withTimeout(3),
+                this.run(() -> rawMove(0)), 
+                isAssistedIntaking).until(this::hasNote),
+            this::hasNote).repeatedly();
     }
 
     @Override

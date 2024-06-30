@@ -8,7 +8,6 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class BottomIntake extends SubsystemBase {
@@ -30,18 +29,15 @@ public class BottomIntake extends SubsystemBase {
         intakeU.set(-speed);
     }
 
-    public Command stop() {
-        return new InstantCommand(() -> {
-            rawMove(0);
-        }, this);
-    }
-
     public Command assistedIntake() {
-        // FIXME: possible failure point here
+        // XXX: possible failure point here
         return new ConditionalCommand(
-            this.run(() -> rawMove(0.5)).repeatedly().withTimeout(3),
             this.run(() -> rawMove(0)),
-            () -> isAssistedIntaking.getAsBoolean() && !SmartDashboard.getBoolean("HasNote", false)).repeatedly();
+            new ConditionalCommand(
+                this.run(() -> rawMove(0.5)).repeatedly().withTimeout(3),
+                this.run(() -> rawMove(0)), 
+                isAssistedIntaking).until(() -> SmartDashboard.getBoolean("HasNote", false)),
+            () -> SmartDashboard.getBoolean("HasNote", false)).repeatedly();
     }
 
     @Override
