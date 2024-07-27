@@ -11,10 +11,10 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LedStrip extends SubsystemBase {
-    private AddressableLED led = new AddressableLED(9);
+    private AddressableLED led = new AddressableLED(8);
     private AddressableLEDBuffer buffer = new AddressableLEDBuffer(62);
     private int position = 7;
-    private boolean flashState = false;
+    private int flashState = 0;
 
     private boolean shooting = false;
     private BooleanSupplier isAssistedIntaking;
@@ -57,14 +57,14 @@ public class LedStrip extends SubsystemBase {
             // if positive, flash orange on the right and black on the left
             // if negative, flash orange on the left and black on the right
             // if zero, flash orange on the left and right
-            if (flashState) {
-                if (offset > 0) {
+            if ((flashState % 6) >= 3) {
+                if (offset < 0) {
                     for (int i = 0; i < 32; i++) {
                         buffer.setLED(i, Color.kOrange);
                         buffer.setLED(61 - i, Color.kBlack);
                     }
-                } else if (offset < 0) {
-                    for (int i = 0; i < 32; i++) {
+                } else if (offset > 0) {
+                    for (int i = 0; i < 31; i++) {
                         buffer.setLED(i, Color.kBlack);
                         buffer.setLED(61 - i, Color.kOrange);
                     }
@@ -79,7 +79,7 @@ public class LedStrip extends SubsystemBase {
                     buffer.setLED(i, Color.kBlack);
                 }
             }
-            flashState = !flashState;
+            flashState++;
             led.setData(buffer);
             return;
         }

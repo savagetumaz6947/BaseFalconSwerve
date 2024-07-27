@@ -47,7 +47,8 @@ public class TeleopSwerve extends Command {
 
         this.vision = vision;
         this.enableAssistedIntake = enableAssistedIntake;
-        assistedIntakeController.setTolerance(1);
+        assistedIntakeController.setTolerance(2);
+        assistedIntakeController.setSetpoint(0);
 
         this.alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
 
@@ -55,7 +56,7 @@ public class TeleopSwerve extends Command {
     }
 
     public double calculateAssistedIntake() {
-        if (enableAssistedIntake.getAsBoolean() && vision.hasTargets()) {
+        if (enableAssistedIntake.getAsBoolean() && vision.hasTargets() && Math.abs(vision.getBestTarget().getYaw()) > 2) {
             return assistedIntakeController.calculate(vision.getBestTarget().getYaw());
         } else {
             return 0;

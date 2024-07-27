@@ -30,12 +30,11 @@ public class BottomIntake extends SubsystemBase {
     }
 
     public Command assistedIntake() {
-        // XXX: possible failure point here
         return new ConditionalCommand(
-            this.run(() -> rawMove(0)),
+            this.runOnce(() -> rawMove(0)),
             new ConditionalCommand(
-                this.run(() -> rawMove(0.5)).repeatedly().withTimeout(3),
-                this.run(() -> rawMove(0)), 
+                this.run(() -> rawMove(0.5)).withTimeout(3),
+                this.runOnce(() -> rawMove(0)), 
                 isAssistedIntaking).until(() -> SmartDashboard.getBoolean("HasNote", false)),
             () -> SmartDashboard.getBoolean("HasNote", false)).repeatedly();
     }

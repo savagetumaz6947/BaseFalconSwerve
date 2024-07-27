@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeAngle extends SubsystemBase {
     private CANSparkMax motor = new CANSparkMax(58, MotorType.kBrushless);
     private BooleanSupplier intakeBottom;
-    private DigitalInput upLimit = new DigitalInput(0);
-    private DigitalInput downLimit = new DigitalInput(1);
+    private DigitalInput upLimit = new DigitalInput(1);
+    private DigitalInput downLimit = new DigitalInput(0);
 
     public IntakeAngle (BooleanSupplier intakeBottomSupplier) {
         motor.setIdleMode(IdleMode.kBrake);
