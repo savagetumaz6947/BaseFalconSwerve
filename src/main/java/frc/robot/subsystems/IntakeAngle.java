@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class IntakeAngle extends SubsystemBase {
     private CANSparkMax motor = new CANSparkMax(58, MotorType.kBrushless);
@@ -21,6 +22,9 @@ public class IntakeAngle extends SubsystemBase {
         motor.setIdleMode(IdleMode.kBrake);
         motor.getEncoder().setPosition(0);
         intakeBottom = intakeBottomSupplier;
+
+        Constants.DEBUG_TAB.addBoolean("IntakeAngle/DownLimit", () -> downLimit.get());
+        Constants.DEBUG_TAB.addBoolean("IntakeAngle/UpLimit", () -> upLimit.get());
     }
 
     public void rawMove (double value) {
@@ -52,8 +56,6 @@ public class IntakeAngle extends SubsystemBase {
     @Override
     public void periodic() {
         // Logger.recordOutput("IntakeAngle/EncoderPos", motor.getEncoder().getPosition());
-        // Logger.recordOutput("IntakeAngle/DownLimit", downLimit.get());
-        // Logger.recordOutput("IntakeAngle/UpLimit", upLimit.get());
         SmartDashboard.putBoolean("IntakeAngle/AtBottom", downLimit.get());
     }
 }

@@ -10,6 +10,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
     private TalonFX leftMotor = new TalonFX(51, "canivore");
@@ -28,6 +29,9 @@ public class Climber extends SubsystemBase {
 
         leftMotor.setPosition(0);
         rightMotor.setPosition(0);
+
+        Constants.DEBUG_TAB.addDouble("Climber/Left", () -> leftMotor.getPosition().getValueAsDouble());
+        Constants.DEBUG_TAB.addDouble("Climber/Right", () -> rightMotor.getPosition().getValueAsDouble());
     }
 
     public void move (DoubleSupplier left, DoubleSupplier right, BooleanSupplier force) {
@@ -35,7 +39,7 @@ public class Climber extends SubsystemBase {
             leftMotor.set(left.getAsDouble());
             rightMotor.set(right.getAsDouble());
         } else {
-            if ((left.getAsDouble() < 0 && leftMotor.getPosition().getValueAsDouble() > -180) || (left.getAsDouble() > 0 && leftMotor.getPosition().getValueAsDouble() < 0)) {
+            if ((left.getAsDouble() < 0 && leftMotor.getPosition().getValueAsDouble() > -126) || (left.getAsDouble() > 0 && leftMotor.getPosition().getValueAsDouble() < 0)) {
                 leftMotor.set(left.getAsDouble());
             } else {
                 leftMotor.set(0);
@@ -47,11 +51,5 @@ public class Climber extends SubsystemBase {
                 rightMotor.set(0);
             }
         }
-    }
-
-    @Override
-    public void periodic() {
-        // Logger.recordOutput("Climber/Left", leftMotor.getPosition().getValueAsDouble());
-        // Logger.recordOutput("Climber/Right", rightMotor.getPosition().getValueAsDouble());
     }
 }

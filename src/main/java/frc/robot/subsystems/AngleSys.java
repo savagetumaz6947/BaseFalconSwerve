@@ -14,6 +14,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class AngleSys extends SubsystemBase {
     private TalonFX leftMotor = new TalonFX(41, "canivore");
@@ -36,6 +37,9 @@ public class AngleSys extends SubsystemBase {
         rightMotor.setControl(new Follower(leftMotor.getDeviceID(), true));
 
         encoder.setPosition(0);
+
+        Constants.DEBUG_TAB.addBoolean("AngleSys/DownLimit", () -> downLimit.get());
+        Constants.DEBUG_TAB.addBoolean("AngleSys/UpLimit", () -> upLimit.get());
     }
 
     public double getAngle() {
@@ -76,8 +80,6 @@ public class AngleSys extends SubsystemBase {
     public void periodic() {
         // Logger.recordOutput("AngleSys/EncoderPos", encoder.getPosition());
         // Logger.recordOutput("AngleSys/EncoderAngleDeg", getAngle());
-        // Logger.recordOutput("AngleSys/DownLimit", downLimit.get());
-        // Logger.recordOutput("AngleSys/UpLimit", upLimit.get());
 
         SmartDashboard.putNumber("AngleSys/EncoderPos", encoder.getPosition());
         SmartDashboard.putNumber("AngleSys/EncoderAngleDeg", getAngle());
