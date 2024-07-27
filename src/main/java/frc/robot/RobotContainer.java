@@ -133,6 +133,7 @@ public class RobotContainer {
     private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 49.5, angleSys);
     private final RiseToAngle riseToPassAngle = new RiseToAngle(() -> 49.5, angleSys);
     private final RiseToAngle riseToAmpAngle = new RiseToAngle(() -> 42, angleSys);
+    private final RiseToAngle riseToSourceAngle = new RiseToAngle(() -> 35, angleSys);
 
     /* Command Definitions */
     private final AutoAimToShoot autoAimToShootCommand = new AutoAimToShoot(swerve);
@@ -147,11 +148,11 @@ public class RobotContainer {
 
     private final Command autoAmpCommand =  new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                new WaitUntilCommand(() -> riseToAmpAngle.isFinished()).withTimeout(2),
+                // new WaitUntilCommand(() -> riseToAmpAngle.isFinished()).withTimeout(2),
                 new WaitUntilCommand(() -> shooter.rpmOkForAmp()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
-            riseToAmpAngle,
+            // riseToAmpAngle,
             shooter.shootRepeatedlyForAmp(),
             new InstantCommand(() -> ledStrip.shoot(true))
         ).finallyDo(() -> {
@@ -169,6 +170,16 @@ public class RobotContainer {
             autoAimToShootCommand.andThen(swerve.run(() -> swerve.driveChassis(new ChassisSpeeds(0,0,0)))),
             autoRiseToAngleCommand,
             shooter.shootRepeatedly(),
+            new InstantCommand(() -> ledStrip.shoot(true))
+        ).finallyDo(() -> {
+            shooter.idle();
+            midIntake.rawMove(0);
+            ledStrip.shoot(false);
+        });
+    public final Command getNoteFromSource = new ParallelDeadlineGroup(
+            midIntake.run(() -> midIntake.rawMove(1)).until(() -> midIntake.hasNote()),
+            riseToSourceAngle,
+            shooter.revIdle(),
             new InstantCommand(() -> ledStrip.shoot(true))
         ).finallyDo(() -> {
             shooter.idle();
@@ -276,7 +287,7 @@ public class RobotContainer {
             angleSys.move(0);
             climber.move(() -> 0, () -> 0, () -> true);
         }, swerve, midIntake, bottomIntake, shooter, angleSys, climber));
-        manualPickupBtn.onTrue(pickUpNoteCommand);
+        manualPickupBtn.onTrue(getNoteFromSource);
         trap1Btn.onTrue(new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 AutoBuilder.pathfindThenFollowPath(

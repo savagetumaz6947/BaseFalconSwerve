@@ -79,8 +79,8 @@ public class TeleopSwerve extends Command {
         /* Drive */
         swerve.drive(
                 new Translation2d(
-                        alliance == Alliance.Blue ? transXVal : -transXVal,
-                        alliance == Alliance.Blue ? transYVal : -transYVal),
+                        alliance == Alliance.Blue ? transXVal : (robotCentricSup.getAsBoolean() ? -transXVal : transXVal),
+                        alliance == Alliance.Blue ? transYVal : (robotCentricSup.getAsBoolean() ? -transYVal : transYVal)),
                 this.rotationSup.getAsDouble() * Constants.Swerve.maxAngularVelocity,
                 robotCentricSup.getAsBoolean(),
                 Constants.Swerve.speedSelection[maxSpeedMode.getAsInt()],

@@ -216,5 +216,6 @@ public class Swerve extends SubsystemBase {
         // Logger.recordOutput("Odometry/Module States", getModuleStates());
 
         // Logger.recordOutput("Odometry/Dist to Speaker", getDistToSpeaker());
+        SmartDashboard.putNumber("DistToSpeaker", getDistToSpeaker());
     }
 }

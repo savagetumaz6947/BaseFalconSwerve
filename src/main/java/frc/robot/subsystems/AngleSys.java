@@ -52,7 +52,7 @@ public class AngleSys extends SubsystemBase {
      * @return
      */
     public double getAutoAngle(double dist) {
-        double value = (58.9 - 8.09 * dist);
+        double value = (60.05 - 8.62 * dist);
         if (value < 29) return 29;
         else if (value > 60) return 60;
         return value; // Refer to Google Sheets
