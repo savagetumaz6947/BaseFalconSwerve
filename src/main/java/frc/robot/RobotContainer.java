@@ -53,23 +53,24 @@ public class RobotContainer {
     private final DoubleSupplier rotationAxis = () -> -driver.getRawAxis(XboxController.Axis.kRightX.value);
 
     /* Driver Buttons */
-    private final Trigger toggleAssistedIntake = new Trigger(() -> driver.getRawAxis(XboxController.Axis.kRightTrigger.value) > 0.8);
+    private final Trigger toggleAssistedIntake = new JoystickButton(driver, XboxController.Button.kB.value);
+    private final Trigger driverPickup = new Trigger(() -> driver.getRawAxis(XboxController.Axis.kRightTrigger.value) > 0.8);
     private final JoystickButton autoShootButton = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
-    private final Trigger autoDriveToAmpPosBtn = new Trigger(() -> {
-        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
-            return driver.getRawButton(XboxController.Button.kX.value);
-        } else {
-            return driver.getRawButton(XboxController.Button.kB.value);
-        }
-    });
+    // private final Trigger autoDriveToAmpPosBtn = new Trigger(() -> {
+    //     if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+    //         return driver.getRawButton(XboxController.Button.kX.value);
+    //     } else {
+    //         return driver.getRawButton(XboxController.Button.kB.value);
+    //     }
+    // });
     private final JoystickButton autoDriveToMidPosBtn = new JoystickButton(driver, XboxController.Button.kA.value);
-    private final Trigger autoDriveToStagePosBtn = new Trigger(() -> {
-        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
-            return driver.getRawButton(XboxController.Button.kB.value);
-        } else {
-            return driver.getRawButton(XboxController.Button.kX.value);
-        }
-    });
+    // private final Trigger autoDriveToStagePosBtn = new Trigger(() -> {
+    //     if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+    //         return driver.getRawButton(XboxController.Button.kB.value);
+    //     } else {
+    //         return driver.getRawButton(XboxController.Button.kX.value);
+    //     }
+    // });
     private final JoystickButton autoDriveToSourceBtn = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton driverCancelSwerveBtn = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     private final JoystickButton fodButton = new JoystickButton(driver, XboxController.Button.kStart.value);
@@ -132,7 +133,7 @@ public class RobotContainer {
     private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 49.5, angleSys);
     private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 49.5, angleSys);
     private final RiseToAngle riseToPassAngle = new RiseToAngle(() -> 49.5, angleSys);
-    private final RiseToAngle riseToAmpAngle = new RiseToAngle(() -> 42, angleSys);
+    private final RiseToAngle riseToAmpAngle = new RiseToAngle(() -> 61, angleSys);
     private final RiseToAngle riseToSourceAngle = new RiseToAngle(() -> 35, angleSys);
 
     /* Command Definitions */
@@ -148,11 +149,11 @@ public class RobotContainer {
 
     private final Command autoAmpCommand =  new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-                // new WaitUntilCommand(() -> riseToAmpAngle.isFinished()).withTimeout(2),
+                new WaitUntilCommand(() -> riseToAmpAngle.isFinished()).withTimeout(2),
                 new WaitUntilCommand(() -> shooter.rpmOkForAmp()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
-            // riseToAmpAngle,
+            riseToAmpAngle,
             shooter.shootRepeatedlyForAmp(),
             new InstantCommand(() -> ledStrip.shoot(true))
         ).finallyDo(() -> {
@@ -241,10 +242,11 @@ public class RobotContainer {
             climber.move(() -> 0, () -> 0, () -> true);
         }, swerve, midIntake, bottomIntake, shooter, angleSys, climber));
         toggleAssistedIntake.onTrue(new InstantCommand(() -> enableAssistedIntake = !enableAssistedIntake));
+        driverPickup.whileTrue(pickUpNoteCommand);
         autoShootButton.onTrue(autoShootCommand);
-        autoDriveToAmpPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToAmpShootSpot"), Constants.defaultPathConstraints));
+        // autoDriveToAmpPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToAmpShootSpot"), Constants.defaultPathConstraints));
         autoDriveToMidPosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToMidShootSpot"), Constants.defaultPathConstraints));
-        autoDriveToStagePosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToStageShootSpot"), Constants.defaultPathConstraints));
+        // autoDriveToStagePosBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToStageShootSpot"), Constants.defaultPathConstraints));
         autoDriveToSourceBtn.onTrue(AutoBuilder.pathfindThenFollowPath(PathPlannerPath.fromPathFile("ToSource"), Constants.defaultPathConstraints));
         maxSpeedUp.onTrue(new InstantCommand(() ->
             maxSpeedMode = maxSpeedMode + 1 < Constants.Swerve.speedSelection.length ? maxSpeedMode + 1 : maxSpeedMode
