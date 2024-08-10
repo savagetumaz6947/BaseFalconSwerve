@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class MidIntake extends SubsystemBase {    
     private CANSparkMax motor = new CANSparkMax(57, MotorType.kBrushless);
 
-    private ColorSensorV3 sensor = new ColorSensorV3(I2C.Port.kOnboard);
+    private ColorSensorV3 sensor = new ColorSensorV3(I2C.Port.kMXP);
 
     private BooleanSupplier isAssistedIntaking;
     
@@ -32,7 +32,7 @@ public class MidIntake extends SubsystemBase {
     }
 
     public boolean hasNote() {
-        return getColor().red > 0.32;
+        return getColor().red > 0.28;
     }
 
     private Color getColor() {

@@ -133,7 +133,7 @@ public class RobotContainer {
     private final RiseToAngle riseToTrap2Angle = new RiseToAngle(() -> 49.5, angleSys);
     private final RiseToAngle riseToTrap3Angle = new RiseToAngle(() -> 49.5, angleSys);
     private final RiseToAngle riseToPassAngle = new RiseToAngle(() -> 49.5, angleSys);
-    private final RiseToAngle riseToAmpAngle = new RiseToAngle(() -> 61, angleSys);
+    private final RiseToAngle riseToAmpAngle = new RiseToAngle(() -> 54, angleSys);
     private final RiseToAngle riseToSourceAngle = new RiseToAngle(() -> 35, angleSys);
 
     /* Command Definitions */
@@ -263,11 +263,11 @@ public class RobotContainer {
         passBallBtn.onTrue(new ParallelDeadlineGroup(
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> riseToPassAngle.isFinished()).withTimeout(2),
-                new WaitUntilCommand(() -> shooter.rpmOkForSpeaker()).withTimeout(2),
+                new WaitUntilCommand(() -> shooter.rpmOkForPass()).withTimeout(2),
                 midIntake.run(() -> midIntake.rawMove(-1)).withTimeout(1)
             ),
             riseToPassAngle,
-            shooter.shootRepeatedly(),
+            shooter.shootRepeatedlyForPass(),
             new InstantCommand(() -> ledStrip.shoot(true))
         ).finallyDo(() -> {
             shooter.idle();

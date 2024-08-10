@@ -4,12 +4,9 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkRelativeEncoder;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,16 +16,19 @@ import frc.robot.Constants;
 public class AngleSys extends SubsystemBase {
     private TalonFX leftMotor = new TalonFX(41, "canivore");
     private TalonFX rightMotor = new TalonFX(42, "canivore");
-    private CANSparkMax sparkMaxEncoderOnly = new CANSparkMax(43, MotorType.kBrushed);
+    // private CANSparkMax sparkMaxEncoderOnly = new CANSparkMax(43, MotorType.kBrushed);
+    private CANcoder encoder = new CANcoder(43, "canivore");
     private DigitalInput downLimit = new DigitalInput(9);
     private DigitalInput upLimit = new DigitalInput(8);
-    private RelativeEncoder encoder;
+    // private RelativeEncoder encoder;
 
     public AngleSys() {
-        encoder = sparkMaxEncoderOnly.getEncoder(SparkRelativeEncoder.Type.kQuadrature, 4096);
+        // encoder = sparkMaxEncoderOnly.getEncoder(SparkRelativeEncoder.Type.kQuadrature, 4096);
 
         TalonFXConfigurator leftConfig = leftMotor.getConfigurator();
         TalonFXConfigurator rightConfig = rightMotor.getConfigurator();
+        // CANcoderConfigurator cancoderConfig = encoder.getConfigurator();
+
         MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
         motorConfigs.NeutralMode = NeutralModeValue.Brake;
         leftConfig.apply(motorConfigs);
@@ -36,14 +36,14 @@ public class AngleSys extends SubsystemBase {
 
         rightMotor.setControl(new Follower(leftMotor.getDeviceID(), true));
 
-        encoder.setPosition(0);
+        // encoder.setPosition(0);
 
         Constants.DEBUG_TAB.addBoolean("AngleSys/DownLimit", () -> downLimit.get());
         Constants.DEBUG_TAB.addBoolean("AngleSys/UpLimit", () -> upLimit.get());
     }
 
     public double getAngle() {
-        return -encoder.getPosition() * 360 + 30;
+        return -encoder.getAbsolutePosition().getValueAsDouble() * 360 + 30;
     }
 
     public boolean getDownLimit() {
@@ -56,14 +56,14 @@ public class AngleSys extends SubsystemBase {
      * @return
      */
     public double getAutoAngle(double dist) {
-        double value = (60.05 - 8.62 * dist);
+        double value = (58.9 - 1.375 - 8.09 * dist);
         if (value < 29) return 29;
-        else if (value > 60) return 60;
+        else if (value > 54) return 54;
         return value; // Refer to Google Sheets
     }
 
     public void move(double val) {
-        if ((downLimit.get() && val < 0) || (upLimit.get() && SmartDashboard.getBoolean("IntakeAngle/AtBottom", false) && val > 0)) {
+        if ((downLimit.get() && val < 0) || (!upLimit.get() && SmartDashboard.getBoolean("IntakeAngle/AtBottom", false) && val > 0)) {
             final DutyCycleOut lRequest = new DutyCycleOut(-val * 1);
             leftMotor.setControl(lRequest);
         } else {
@@ -81,7 +81,7 @@ public class AngleSys extends SubsystemBase {
         // Logger.recordOutput("AngleSys/EncoderPos", encoder.getPosition());
         // Logger.recordOutput("AngleSys/EncoderAngleDeg", getAngle());
 
-        SmartDashboard.putNumber("AngleSys/EncoderPos", encoder.getPosition());
+        SmartDashboard.putNumber("AngleSys/EncoderPos", encoder.getAbsolutePosition().getValueAsDouble());
         SmartDashboard.putNumber("AngleSys/EncoderAngleDeg", getAngle());
     }
 }

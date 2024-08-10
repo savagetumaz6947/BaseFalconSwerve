@@ -34,6 +34,17 @@ public class Shooter extends SubsystemBase {
         });
     }
 
+    public Command shootRepeatedlyForPass() {
+        return this.runEnd(() -> {
+            up.set(-.5);
+            down.set(.5);
+        }, () -> {
+            up.set(0);
+            down.set(0);
+        });
+    }
+
+
     public Command shootRepeatedlyForAmp() {
         return this.runEnd(() -> {
             up.set(-0.09);
@@ -94,6 +105,11 @@ public class Shooter extends SubsystemBase {
     public boolean rpmOkForAmp() {
         return up.getEncoder().getVelocity() <= -350;
     }
+
+    public boolean rpmOkForPass() {
+        return up.getEncoder().getVelocity() <= -2400;
+    }
+
 
     @Override
     public void periodic() {
